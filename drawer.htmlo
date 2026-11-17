@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   AI TOOLKIT — the look
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  --navy:#0F1F3D; --navy2:#1B3A6B; --ink:#0B1526;
+  --gold:#D4AF61; --gold2:#F0D9A0;
+  --paper:#FFFFFF; --mist:#F1F5FC; --line:#DDE5F2;
+  --text:#12203A; --dim:#5E6C85;
+  --green:#2E8B57; --red:#C0504D; --amber:#D68910;
+  --r:14px; --shadow:0 4px 20px rgba(15,31,61,.10);
+  --glow:0 0 0 3px rgba(212,175,97,.18);
+}
+body.dark{
+  --paper:#111C30; --mist:#18253D; --line:#26364F;
+  --text:#E8EEF9; --dim:#93A5C2; --ink:#0A1220;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body.forest{ --navy:#123829; --navy2:#1D5C42; --gold:#C9A227; --gold2:#E8D48B; --mist:#EFF6F1; }
+body.plum{ --navy:#2E1A3D; --navy2:#4A2C63; --gold:#D9A441; --gold2:#F2DCA8; --mist:#F5F0FA; }
+body.slate{ --navy:#1E2A33; --navy2:#33454F; --gold:#C4A46A; --gold2:#E6D4AE; --mist:#F0F3F5; }
+
+*{box-sizing:border-box}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+::-webkit-scrollbar-track{background:transparent}
+
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size:13.5px;color:var(--text);background:var(--mist);
+  -webkit-font-smoothing:antialiased}
+
+/* ── header ── */
+header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  color:#fff;padding:13px 15px;display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden}
+header::after{content:'';position:absolute;right:-60px;top:-90px;width:220px;height:220px;
+  border-radius:50%;background:rgba(255,255,255,.05)}
+.avatar{width:42px;height:42px;border-radius:14px;flex:0 0 42px;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;
+  overflow:hidden;background-size:cover;background-position:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);transition:.2s;z-index:1}
+.avatar:hover{transform:translateY(-1px) scale(1.04)}
+.who{flex:1;min-width:0;z-index:1}
+.hello{font-size:15.5px;font-weight:700;margin:0;letter-spacing:-.2px;cursor:pointer}
+.sub{font-size:11px;color:rgba(255,255,255,.62);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hicons{display:flex;gap:4px;z-index:1}
+.hicon{width:29px;height:29px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;cursor:pointer;background:rgba(255,255,255,.10);
+  transition:.15s}
+.hicon:hover{background:rgba(255,255,255,.22);transform:translateY(-1px)}
+.hicon.on{background:var(--gold);color:var(--ink)}
+
+/* ── tabs ── */
+.tabs{display:flex;background:var(--paper);border-bottom:1px solid var(--line);
+  overflow-x:auto;position:sticky;top:0;z-index:20}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:64px;padding:11px 4px 9px;text-align:center;font-size:11px;
+  font-weight:600;color:var(--dim);cursor:pointer;border-bottom:2.5px solid transparent;
+  transition:.15s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--mist)}
+.tab.on{color:var(--navy2);border-bottom-color:var(--gold);background:var(--mist)}
+body.dark .tab.on{color:var(--gold)}
+.tab i{display:block;font-size:14px;font-style:normal;margin-bottom:2px}
+
+.page{display:none;padding:14px;animation:rise .22s ease}
+.page.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── shared bits ── */
+label{display:block;font-size:11px;font-weight:700;color:var(--dim);
+  margin:12px 0 5px;letter-spacing:.4px;text-transform:uppercase}
+input,textarea,select{width:100%;padding:9px 11px;border:1.5px solid var(--line);
+  border-radius:10px;font-family:inherit;font-size:13px;color:var(--text);
+  background:var(--paper);transition:.15s}
+textarea{resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(212,175,97,.16)}
+input[type=file]{padding:6px;font-size:11px;border:0}
+
+button{width:100%;padding:11px;border:0;border-radius:10px;
+  background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;
+  font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:10px;
+  transition:.15s;box-shadow:0 2px 8px rgba(15,31,61,.18)}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 16px rgba(15,31,61,.26)}
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.5;cursor:default;box-shadow:none}
+button.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink)}
+button.ghost{background:var(--paper);color:var(--text);border:1.5px solid var(--line);
+  box-shadow:none;font-weight:500}
+button.ghost:hover:not(:disabled){border-color:var(--gold);background:var(--mist)}
+button.small{padding:6px 9px;font-size:11px;margin-top:0;border-radius:8px}
+.row{display:flex;gap:9px}.row>*{flex:1}
+.divider{height:1px;background:var(--line);margin:16px 0}
+
+.out{margin-top:11px;padding:12px 13px;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--r);white-space:pre-wrap;line-height:1.6;min-height:42px;font-size:13px;
+  box-shadow:var(--shadow)}
+.out.warn{border-left:3px solid var(--amber);background:var(--paper)}
+.out.err{border-left:3px solid var(--red)}
+.out.good{border-left:3px solid var(--green)}
+.hint{font-size:11.5px;color:var(--dim);margin-top:7px;line-height:1.55}
+.empty{text-align:center;color:var(--dim);padding:26px 12px;font-size:12.5px;line-height:1.7}
+
+/* ── cards ── */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px;margin-bottom:10px;box-shadow:var(--shadow);transition:.15s}
+.card:hover{border-color:var(--gold);transform:translateY(-1px)}
+.card.off{opacity:.5}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cname{font-weight:700;font-size:13.5px}
+.cmeta{font-size:11px;color:var(--dim);margin-top:3px;font-family:ui-monospace,Menlo,monospace}
+.cacts{display:flex;gap:6px;margin-top:9px}
+
+.chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;
+  letter-spacing:.3px}
+.chip.ok{background:rgba(46,139,87,.14);color:var(--green)}
+.chip.bad{background:rgba(192,80,77,.14);color:var(--red)}
+.chip.rest{background:rgba(214,137,16,.15);color:var(--amber)}
+.chip.idle{background:var(--mist);color:var(--dim)}
+
+/* ── stat tiles ── */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:9px;margin-top:10px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:12px;
+  padding:11px 9px;text-align:center;box-shadow:var(--shadow);transition:.15s}
+.tile:hover{transform:translateY(-2px);border-color:var(--gold)}
+.tile b{display:block;font-size:20px;font-weight:800;letter-spacing:-.5px;
+  background:linear-gradient(135deg,var(--navy),var(--navy2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.dark .tile b{background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;background-clip:text}
+.tile span{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px}
+
+/* ── the starter grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin-top:10px}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;
+  cursor:pointer;transition:.15s;box-shadow:var(--shadow)}
+.tcard:hover{border-color:var(--gold);transform:translateY(-2px)}
+.tcard .ic{font-size:20px;margin-bottom:6px}
+.tcard .ti{font-weight:700;font-size:12.5px;line-height:1.3;margin-bottom:4px}
+.tcard .wh{font-size:11px;color:var(--dim);line-height:1.45}
+
+/* ── chat ── */
+.chat{padding:12px;min-height:120px}
+.bubble{max-width:90%;padding:10px 13px;border-radius:16px;margin-bottom:9px;
+  font-size:13px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;
+  animation:pop .2s ease;box-shadow:var(--shadow)}
+@keyframes pop{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:none}}
+.bubble.you{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;
+  margin-left:auto;border-bottom-right-radius:5px}
+.bubble.ai{background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:5px}
+.meta{font-size:10px;color:var(--dim);margin:-5px 0 11px 5px}
+.meta b{color:var(--gold)}
+.timer{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:11px;
+  background:var(--ink);color:var(--gold2);padding:2px 8px;border-radius:20px;margin-left:7px}
+.step{font-size:11.5px;padding:7px 10px;margin-top:6px;border-left:2.5px solid var(--gold);
+  background:var(--paper);border-radius:0 9px 9px 0;box-shadow:var(--shadow)}
+.step b{color:var(--gold)}
+
+/* ── suggestion chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chips span{font-size:11.5px;background:var(--paper);border:1px solid var(--line);
+  padding:6px 11px;border-radius:20px;cursor:pointer;transition:.15s;box-shadow:var(--shadow)}
+.chips span:hover{border-color:var(--gold);transform:translateY(-1px)}
+
+/* ── command palette ── */
+.veil{display:none;position:fixed;inset:0;background:rgba(10,18,32,.55);z-index:999;
+  backdrop-filter:blur(3px);animation:fade .15s}
+.veil.on{display:block}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.palette{position:fixed;top:12%;left:50%;transform:translateX(-50%);width:min(560px,92vw);
+  background:var(--paper);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.35);
+  z-index:1000;overflow:hidden;animation:drop .2s ease}
+@keyframes drop{from{opacity:0;transform:translateX(-50%) translateY(-14px)}
+  to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.palette input{border:0;border-radius:0;border-bottom:1px solid var(--line);
+  padding:16px;font-size:15px;box-shadow:none}
+.palette input:focus{box-shadow:none;border-color:var(--line);border-bottom-color:var(--gold)}
+.plist{max-height:card;max-height:340px;overflow-y:auto}
+.pitem{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:11px;
+  border-bottom:1px solid var(--line)}
+.pitem:hover,.pitem.sel{background:var(--mist)}
+.pitem .pi{font-size:16px;width:22px;text-align:center}
+.pitem .pt{font-weight:600;font-size:13px}
+.pitem .pd{font-size:11px;color:var(--dim);margin-top:1px}
+
+/* ── toasts ── */
+.toasts{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:1001;
+  display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:none}
+.toast{background:var(--ink);color:#fff;padding:10px 17px;border-radius:22px;
+  font-size:12.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.3);
+  animation:up .25s ease;max-width:88vw}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.toast.good{background:var(--green)} .toast.err{background:var(--red)}
+
+/* ── skeleton while loading ── */
+.skel{height:13px;border-radius:7px;margin:7px 0;
+  background:linear-gradient(90deg,var(--line) 25%,var(--mist) 50%,var(--line) 75%);
+  background-size:200% 100%;animation:shim 1.3s infinite}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── voice orb ── */
+.orb{width:72px;height:72px;border-radius:50%;margin:4px auto 9px;display:flex;
+  align-items:center;justify-content:center;font-size:25px;background:var(--paper);
+  border:2px solid var(--line);transition:.25s;box-shadow:var(--shadow)}
+.orb.listening{border-color:var(--green);animation:beat 1.5s ease-in-out infinite;
+  box-shadow:0 0 0 0 rgba(46,139,87,.35)}
+.orb.heard{border-color:var(--gold);background:rgba(212,175,97,.12)}
+.orb.thinking{border-color:var(--gold);animation:beat .7s ease-in-out infinite}
+.orb.speaking{border-color:var(--navy2);background:rgba(27,58,107,.10)}
+.orb.off{opacity:.45}
+@keyframes beat{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(46,139,87,.35)}
+  50%{transform:scale(1.07);box-shadow:0 0 0 12px rgba(46,139,87,0)}}
+.vstate{text-align:center;font-size:11.5px;color:var(--dim);min-height:16px}
+.heardline{text-align:center;font-size:13px;font-weight:600;min-height:19px;margin-top:3px}
+
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;
+  color:var(--dim);font-size:12.5px;cursor:pointer;transition:.15s;background:var(--paper)}
+.drop:hover,.drop.over{border-color:var(--gold);background:rgba(212,175,97,.07)}
+.thumb{max-width:100%;max-height:160px;border-radius:11px;margin-top:9px;box-shadow:var(--shadow)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line);
+  border-top-color:var(--gold);border-radius:50%;animation:sp .7s linear infinite;
+  vertical-align:-1px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* setup wizard */
+.wiz{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:13px;margin-bottom:10px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.wiz.star::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--gold),var(--gold2))}
+.wiz .wt{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wiz .wn{font-weight:700;font-size:14px}
+.wiz .wf{font-size:11.5px;color:var(--dim);margin-top:3px}
+.wiz ol{margin:9px 0 0 16px;padding:0;font-size:12px;color:var(--dim);line-height:1.75}
+.wiz .wnote{font-size:11.5px;margin-top:8px;padding:8px 10px;background:var(--mist);
+  border-radius:9px;color:var(--text)}
+.wiz a{color:var(--navy2);font-weight:600;text-decoration:none}
+body.dark .wiz a{color:var(--gold)}
+
+.meter{height:7px;border-radius:7px;background:var(--line);overflow:hidden;margin:9px 0 4px}
+.meter i{display:block;height:100%;border-radius:7px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .5s ease}
+
+.colcard{background:var(--paper);border:1px solid var(--line);border-radius:11px;
+  padding:9px 11px;margin-bottom:7px}
+.colcard .cn{font-weight:700;font-size:12.5px}
+.colcard .ct{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
+  background:var(--mist);color:var(--dim);margin-left:6px}
+.bar{height:5px;border-radius:5px;background:var(--line);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold)}
+
+.idea{display:flex;gap:10px;align-items:flex-start;background:var(--paper);
+  border:1px solid var(--line);border-radius:11px;padding:10px 11px;margin-bottom:7px;
+  cursor:pointer;transition:.15s}
+.idea:hover{border-color:var(--gold);transform:translateX(2px)}
+.idea .ii{font-size:17px}
+.idea .it{font-weight:700;font-size:12.5px}
+.idea .iw{font-size:11.5px;color:var(--dim);margin-top:2px;line-height:1.45}
+
+/* ── fold sections away until they are wanted ── */
+.fold{border:1px solid var(--line);border-radius:var(--r);margin-bottom:9px;
+  background:var(--paper);overflow:hidden;box-shadow:var(--shadow)}
+.fold>summary{padding:11px 13px;cursor:pointer;font-weight:700;font-size:13px;
+  list-style:none;display:flex;justify-content:space-between;align-items:center;
+  transition:.15s;user-select:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary:hover{background:var(--mist)}
+.fold>summary::after{content:'▾';color:var(--dim);font-size:12px;transition:.2s}
+.fold[open]>summary::after{transform:rotate(180deg)}
+.fold[open]>summary{border-bottom:1px solid var(--line);background:var(--mist)}
+.fold .body{padding:12px 13px}
+.fold .tagline{font-size:11px;color:var(--dim);font-weight:400;margin-left:8px}
+
+.kbd{font-family:ui-monospace,monospace;font-size:10px;background:var(--mist);
+  border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--dim)}
+
+/* ── two columns when there is room ── */
+/* ── minimised: just the header, floating out of the way ── */
+body.mini .tabs,body.mini .shell,body.mini #wsBar{display:none}
+body.mini{background:transparent}
+body.mini header{border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.28)}
+body.mini .who .sub{display:none}
+body.mini .hello{font-size:13.5px}
+body.mini .avatar{width:32px;height:32px;flex:0 0 32px;font-size:14px;border-radius:10px}
+
+/* ── compact: one column, tighter, for a narrow screen ── */
+body.compact .page{padding:10px}
+body.compact .tab{font-size:10px;padding:8px 2px 6px}
+body.compact .tab i{font-size:12px}
+body.compact .out{font-size:12.5px;padding:10px}
+body.compact .card{padding:10px}
+body.compact .right{display:none}
+
+/* ── a preview strip before a heavy job ── */
+.preview{display:none;margin-top:10px;padding:11px 13px;border-radius:var(--r);
+  background:var(--mist);border:1px dashed var(--gold)}
+.preview.on{display:block;animation:rise .2s ease}
+.preview b{color:var(--navy2)}
+body.dark .preview b{color:var(--gold)}
+.preview .pw{font-size:11.5px;color:var(--amber);margin-top:6px;line-height:1.5}
+
+/* ── the did-that-help strip ── */
+.rate{display:none;align-items:center;gap:8px;margin-top:9px;font-size:11.5px;color:var(--dim)}
+.rate.on{display:flex}
+.rate button{width:auto;margin:0;padding:5px 12px;font-size:12px;border-radius:20px}
+.thanks{font-size:11.5px;color:var(--green);margin-top:9px}
+
+body.wide .shell{display:flex;height:calc(100vh - 108px)}
+body.wide .left{flex:1.3;min-width:0;overflow-y:auto}
+body.wide .right{flex:1;min-width:0;overflow-y:auto;background:var(--mist);
+  border-left:1px solid var(--line)}
+body:not(.wide) .right{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="avatar" id="avatar" title="Your profile">🙂</div>
+  <div class="who">
+    <p class="hello" id="hello" title="Tap to hear it">Hello</p>
+    <div class="sub" id="sub">Loading…</div>
+  </div>
+  <div class="hicons">
+    <div class="hicon" id="miniBtn" title="Minimise (Ctrl+M)">▁</div>
+    <div class="hicon" id="cmdBtn" title="Command palette (Ctrl+K)">⌘</div>
+    <div class="hicon" id="voiceTog" title="Speak answers aloud">🔈</div>
+    <div class="hicon" id="themeBtn" title="Theme">🎨</div>
+    <div class="hicon" id="gear" title="Profile">⚙</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab on" data-p="home"><i>◈</i>Home</div>
+  <div class="tab" data-p="agent"><i>✦</i>Assistant</div>
+  <div class="tab" data-p="ask"><i>▤</i>Data</div>
+  <div class="tab" data-p="make"><i>✧</i>Make</div>
+  <div class="tab" data-p="world"><i>◍</i>World</div>
+  <div class="tab" data-p="flow"><i>⚡</i>Flows</div>
+  <div class="tab" data-p="people"><i>◉</i>People</div>
+  <div class="tab" data-p="setup"><i>◎</i>Setup</div>
+  <div class="tab" data-p="tg"><i>✈</i>Telegram</div>
+  <div class="tab" data-p="keys"><i>⚿</i>Keys</div>
+</div>
+
+<div id="wsBar" style="display:none;padding:9px 14px;background:var(--paper);
+     border-bottom:1px solid var(--line)">
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.4px">WORKING ON</span>
+    <select id="wsTab" style="width:auto;flex:1;min-width:110px;padding:6px 9px;font-size:12px"></select>
+    <input id="wsRange" placeholder="A1:H61 (blank = all)"
+      style="width:auto;flex:1;min-width:110px;padding:6px 9px;font-size:12px">
+    <button class="ghost small" id="wsSave" style="flex:0 0 auto">Set</button>
+  </div>
+  <div class="hint" id="wsNote" style="margin-top:5px"></div>
+</div>
+
+<div class="shell"><div class="left">
+
+<!-- ═══════════ HOME ═══════════ -->
+<div class="page on" id="p-home">
+  <div id="satBanner"></div>
+
+  <div class="card" style="border-color:var(--gold)">
+    <div class="cname" id="homeHello" style="font-size:15px">…</div>
+    <div class="cmeta" id="homeLine" style="margin-top:4px">…</div>
+    <div class="cacts" style="margin-top:10px">
+      <button class="gold small" id="openSheetView">📂 Show me my sheet</button>
+      <button class="ghost small" id="homeAsk">💬 Just ask</button>
+    </div>
+  </div>
+
+  <div id="sheetView"></div>
+
+  <details class="fold"><summary>✨ Start with one of these<span class="tagline">sixteen one-tap jobs</span></summary><div class="body">
+    <div class="grid" id="starters"></div>
+  </div></details>
+
+  <details class="fold"><summary>💬 What can I say?<span class="tagline">everything it understands, with examples</span></summary><div class="body">
+    <div id="canDo"></div>
+  </div></details>
+
+  <details class="fold"><summary>📊 How things are going<span class="tagline">keys, streak, recent activity</span></summary><div class="body">
+    <div id="dash"><div class="skel"></div><div class="skel" style="width:70%"></div></div>
+  </div></details>
+
+  <details class="fold"><summary>◎ Set yourself up<span class="tagline">what is still to do</span></summary><div class="body">
+    <div id="setupList"></div>
+  </div></details>
+</div>
+
+<!-- ═══════════ ASSISTANT ═══════════ -->
+<div class="page" id="p-agent">
+  <div class="orb off" id="orb">🎧</div>
+  <div class="vstate" id="vstate">Hands-free is off</div>
+  <div class="heardline" id="heard"></div>
+  <div class="row">
+    <button class="gold" id="handsBtn">Start hands-free</button>
+    <button class="ghost" id="voiceCfg" style="flex:0 0 46px">⚙</button>
+  </div>
+
+  <div id="voiceBox" style="display:none;margin-top:10px">
+    <div class="row">
+      <div><label>Wake word</label><input id="wakeWord" value="jarvis" maxlength="20"></div>
+      <div><label>Language</label><select id="vlang">
+        <option value="en-KE">English (Kenya)</option><option value="en-GB">English (UK)</option>
+        <option value="en-US">English (US)</option><option value="sw-KE">Kiswahili</option>
+        <option value="en-IN">English (India)</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>Speed</label><select id="vrate">
+        <option value="0.9">Slower</option><option value="1.02" selected>Normal</option>
+        <option value="1.2">Faster</option></select></div>
+      <div><label>Wake word</label><select id="needWake">
+        <option value="yes">Required</option><option value="no">Open mic</option></select></div>
+    </div>
+    <button class="ghost" id="vsave">Save voice settings</button>
+    <div class="hint" id="vhint"></div>
+  </div>
+
+  <div class="divider"></div>
+  <label>Ask for anything</label>
+  <div class="row">
+    <textarea id="task" rows="3" placeholder="Summarise column F and email the team"></textarea>
+    <button class="ghost" id="mic" style="flex:0 0 46px" title="Speak">🎙</button>
+  </div>
+  <div class="chips" id="quickTask"></div>
+  <button class="gold" id="goBtn">Do it &nbsp;<span class="kbd">Ctrl↵</span></button>
+  <div id="flowBox" style="display:none" class="card">
+    <div class="ctop"><span class="cname" id="flowTitle">…</span>
+      <button class="ghost small" id="flowCancel" style="width:auto">Cancel</button></div>
+    <div class="out" id="flowAsk" style="margin-top:9px"></div>
+    <div class="row" style="margin-top:8px">
+      <div style="flex:3"><input id="flowInput" placeholder="type your answer…"></div>
+      <div><button id="flowSend" style="margin-top:0">Next</button></div>
+    </div>
+    <div class="chips" id="flowHints"></div>
+  </div>
+  <div class="preview" id="agentPreview"></div>
+  <div class="out" id="agentOut">Say hello, ask a question, or give me a job.</div>
+  <div class="rate" id="agentRate">
+    <span>Did that help?</span>
+    <button class="ghost" onclick="rateIt(true)">👍 Yes</button>
+    <button class="ghost" onclick="rateIt(false)">👎 Not really</button>
+  </div>
+  <div class="chips" id="nextChips"></div>
+  <div id="trail"></div>
+  <div class="row" id="afterAgent" style="display:none">
+    <button class="ghost" id="speak">🔊 Read it</button>
+    <button class="ghost" id="toSheet">Into the sheet</button>
+    <button class="ghost" id="saveFlow">Save as flow</button>
+  </div>
+
+  <div class="divider"></div>
+  <label>Show it a picture</label>
+  <div class="drop" id="drop">Click or drag a picture in<br>
+    <span style="font-size:11px">receipts · charts · handwriting · screenshots</span></div>
+  <input type="file" id="pic" accept="image/*" style="display:none">
+  <img id="thumb" class="thumb" style="display:none">
+  <input id="picQ" placeholder="What should I look for?" style="margin-top:9px">
+  <div class="row">
+    <button class="ghost" id="picAsk">Read it</button>
+    <button class="ghost" id="picTable">Make it a table</button>
+  </div>
+  <div class="out" id="picOut" style="display:none"></div>
+</div>
+
+<!-- ═══════════ DATA ═══════════ -->
+<div class="page" id="p-ask">
+  <label>Ask about the cells you highlighted</label>
+  <textarea id="q" rows="3" placeholder="What are the three biggest problems here?"></textarea>
+  <div class="chips" id="quickAsk"></div>
+  <div class="hint" id="sel">Highlight cells in the sheet, then ask.</div>
+  <div class="row">
+    <button id="askBtn">Analyse selection</button>
+    <button class="gold" id="askCheck" title="Answer, then check every figure against the data">✓ Answer &amp; check</button>
+  </div>
+  <div class="out" id="ans">Your answer will appear here.</div>
+  <div id="verifyBox"></div>
+  <div class="row" id="afterAns" style="display:none">
+    <button class="ghost" id="putBelow">Into the sheet</button>
+    <button class="ghost" id="copy">Copy</button>
+  </div>
+
+
+
+  <details class="fold"><summary>Fill a whole column<span class="tagline">classify or label every row</span></summary><div class="body">
+  <label style="margin-top:0">Instruction</label>
+  <textarea id="job" rows="2" placeholder="Classify into: Delivery, Price, Quality, Staff. One word. If none fit, UNCLEAR."></textarea>
+  <div class="row">
+    <div><label>Read</label><input id="src" value="E" maxlength="2"></div>
+    <div><label>Write</label><input id="tgt" value="F" maxlength="2"></div>
+    <div><label>From</label><input id="r1" value="2" type="number"></div>
+    <div><label>To</label><input id="r2" value="11" type="number"></div>
+  </div>
+  <div class="row">
+    <button id="runBtn">One by one</button>
+    <button class="gold" id="fastBtn">Fill FAST</button>
+  </div>
+  <div class="preview" id="fillPreview"></div>
+  <div class="out" id="runOut">Fast mode does about 12 rows per request.</div>
+  </div></details>
+
+  <details class="fold"><summary>Superpowers<span class="tagline">clean, split, chart, formulas</span></summary><div class="body">
+  <div class="chips" id="powers"></div>
+  <input id="powerArg" placeholder="…then the detail here" style="margin-top:9px">
+  <div class="row">
+    <button class="ghost" id="powerGo">Run it</button>
+    <button class="ghost" id="undoBtn">↩ Undo</button>
+  </div>
+  <div class="out" id="powerOut" style="display:none"></div>
+  </div></details>
+
+  <details class="fold"><summary>Work it out exactly<span class="tagline">no AI — the figures are always right</span></summary><div class="body">
+  <div class="row">
+    <div><select id="anTab"></select></div>
+    <div><input id="anCol" placeholder="column, e.g. F" maxlength="2"></div>
+  </div>
+  <div class="row">
+    <button class="ghost small" id="anGroups">📊 Count the groups</button>
+    <button class="ghost small" id="anOut">📍 Find outliers</button>
+    <button class="ghost small" id="anTrend">📈 Trend over time</button>
+  </div>
+  <div class="row" style="margin-top:7px">
+    <div><select id="anTabB"></select></div>
+    <div><input id="anColB" placeholder="column" maxlength="2"></div>
+    <div><button class="ghost small" id="anCross" style="margin-top:0">🔗 Match two tabs</button></div>
+  </div>
+  <div class="out" id="anOutBox" style="display:none"></div>
+
+  </div></details>
+</div>
+
+<!-- ═══════════ MAKE ═══════════ -->
+<div class="page" id="p-make">
+  <details class="fold" open><summary>🎨 A picture<span class="tagline">free, no key needed</span></summary><div class="body">
+  <label style="margin-top:0">Describe it</label>
+  <textarea id="imgP" rows="2" placeholder="a matatu at sunset in Thika, warm colours"></textarea>
+  <div class="row">
+    <div><select id="imgS">
+      <option value="">Plain</option>
+      <option value="photorealistic, sharp, natural light">Photo</option>
+      <option value="flat vector illustration, bold colours">Illustration</option>
+      <option value="watercolour painting, soft edges">Watercolour</option>
+      <option value="clean minimal logo, white background">Logo</option>
+      <option value="infographic style, clear labels">Infographic</option>
+      <option value="cinematic still, dramatic lighting">Cinematic</option>
+      <option value="pencil sketch, hand drawn">Sketch</option>
+    </select></div>
+    <div><select id="imgW">
+      <option value="sheet">Into the sheet</option>
+      <option value="drive">Save to Drive</option>
+    </select></div>
+  </div>
+  <button class="gold" id="imgGo">Make it</button>
+  <div class="out" id="imgOut" style="display:none"></div>
+
+  </div></details>
+
+  <details class="fold"><summary>📄 A document<span class="tagline">write a real Google Doc</span></summary><div class="body">
+  <div class="row">
+    <div style="flex:1.4"><input id="docT" placeholder="Q3 Delivery Review"></div>
+    <div><select id="docS">
+      <option value="">Neutral</option><option value="formal and precise">Formal</option>
+      <option value="warm and plain-spoken">Plain</option>
+      <option value="persuasive, for a decision maker">Persuasive</option></select></div>
+  </div>
+  <textarea id="docB" rows="2" placeholder="What should it cover?"></textarea>
+  <div class="row">
+    <button id="docGo">Write it</button>
+    <button class="ghost" id="pdfGo">Sheet → PDF</button>
+  </div>
+  <div class="out" id="docOut" style="display:none"></div>
+
+  </div></details>
+
+  <details class="fold"><summary>📊 A slide deck<span class="tagline">real Google Slides</span></summary><div class="body">
+  <div class="row">
+    <div style="flex:2"><input id="slT" placeholder="Delivery review"></div>
+    <div style="flex:0 0 70px"><input id="slN" type="number" value="6" min="3" max="15"></div>
+  </div>
+  <textarea id="slB" rows="2" placeholder="What should it cover?"></textarea>
+  <button id="slGo">Build it</button>
+  <div class="out" id="slOut" style="display:none"></div>
+
+  </div></details>
+
+  <details class="fold"><summary>💻 Code<span class="tagline">15 languages, saved to Drive</span></summary><div class="body">
+  <textarea id="cdR" rows="2" placeholder="a script that emails me when a cell says UNCLEAR"></textarea>
+  <div class="row">
+    <div><select id="cdL">
+      <option>javascript</option><option>python</option><option>apps script</option>
+      <option>sql</option><option>html</option><option>java</option><option>php</option>
+      <option>go</option><option>rust</option><option>c++</option><option>bash</option>
+      <option>r</option><option>kotlin</option><option>swift</option><option>typescript</option>
+    </select></div>
+    <div><button id="cdGo" style="margin-top:0">Write it</button></div>
+  </div>
+  <div class="out" id="cdOut" style="display:none"></div>
+
+  </div></details>
+
+  <details class="fold"><summary>🎬 A video plan<span class="tagline">script, shots and storyboard</span></summary><div class="body">
+  <div class="row">
+    <div style="flex:2"><input id="vdT" placeholder="why our Ruaka deliveries are late"></div>
+    <div style="flex:0 0 78px"><input id="vdS" type="number" value="45" min="15" max="180"></div>
+  </div>
+  <div class="row">
+    <button id="vdGo">Script + shots</button>
+    <button class="ghost" id="vdF">+ storyboard</button>
+  </div>
+  <div class="out" id="vdOut" style="display:none"></div>
+  <div class="hint">No free service renders finished video. You get the script, the shot list
+  and real storyboard pictures — finish it in CapCut, Canva or Clipchamp.</div>
+  </div></details>
+</div>
+
+<!-- ═══════════ WORLD ═══════════ -->
+<div class="page" id="p-world">
+  <div class="row">
+    <button class="gold" id="briefBtn">☀️ Brief me</button>
+    <button class="ghost" id="speakBrief" style="flex:0 0 50px">🔊</button>
+  </div>
+  <div class="out" id="briefOut">Calendar, yesterday, unread email and a headline — one short read.</div>
+
+  <div class="divider"></div>
+  <label>What is happening</label>
+  <div class="row">
+    <div style="flex:2"><input id="topic" placeholder="artificial intelligence"></div>
+    <div><select id="src2">
+      <option value="news">World news</option><option value="tech">Hacker News</option>
+      <option value="wiki">Wikipedia</option></select></div>
+  </div>
+  <div class="row">
+    <button id="fetchBtn">Fetch</button>
+    <button class="ghost" id="saveFeed">Fetch &amp; save</button>
+  </div>
+  <div class="out" id="worldOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>⚖️ Ask several AIs the same thing</label>
+  <textarea id="cmpQ" rows="2" placeholder="Explain retrieval augmented generation in one paragraph"></textarea>
+  <button class="ghost" id="cmpGo">Compare them</button>
+  <div class="out" id="cmpOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>🐝 Send a research team</label>
+  <div class="row">
+    <div style="flex:2"><input id="swarmTopic" placeholder="Should we open a branch in Nakuru?"></div>
+    <div style="flex:0 0 70px"><input id="swarmN" type="number" value="6" min="2" max="20"></div>
+  </div>
+  <input id="swarmUrls" placeholder="optional links, space separated">
+  <button class="gold" id="swarmBtn">Research it</button>
+  <div class="out" id="swarmOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <div class="row">
+    <button class="ghost small" id="wxBtn">Weather</button>
+    <button class="ghost small" id="fxBtn">USD→KES</button>
+    <button class="ghost small" id="yBtn">Yesterday</button>
+  </div>
+  <div class="out" id="quickOut" style="display:none"></div>
+</div>
+
+<!-- ═══════════ FLOWS ═══════════ -->
+<div class="page" id="p-flow">
+  <label>Saved workflows</label>
+  <div id="flowList"><div class="skel"></div><div class="skel" style="width:60%"></div></div>
+  <button class="ghost" id="flowRefresh">Refresh</button>
+
+  <div class="divider"></div>
+  <label>Build a new one</label>
+  <div class="row">
+    <div><input id="flowName" placeholder="morning_check"></div>
+    <div style="flex:1.4"><input id="flowWhat" placeholder="what it does"></div>
+  </div>
+  <textarea id="flowSteps" rows="4" placeholder="One step per line, in plain English:&#10;Fill column F from column E using the classify instruction&#10;Summarise column F&#10;Email the team a report"></textarea>
+  <div class="row">
+    <button class="gold" id="flowSave">Save it</button>
+    <button class="ghost" id="flowFromChat">From my last chat</button>
+  </div>
+  <div class="out" id="flowOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>Scheduled jobs</label>
+  <div class="row">
+    <div><select id="jobName">
+      <option value="morningBrief">Morning brief</option>
+      <option value="scheduledBrief">Sheet summary</option>
+      <option value="watchSheet">Watch for problems</option></select></div>
+    <div style="flex:0 0 70px"><input id="jobHour" type="number" value="7" min="0" max="23"></div>
+  </div>
+  <div class="row">
+    <button class="ghost" id="jobAdd">Schedule</button>
+    <button class="ghost" id="jobClear">Clear all</button>
+  </div>
+  <div class="out" id="jobOut" style="display:none"></div>
+</div>
+
+<!-- ═══════════ PEOPLE ═══════════ -->
+<div class="page" id="p-people">
+  <label>Paste names, emails and numbers — any mess</label>
+  <textarea id="blob" rows="4" placeholder="Ann Wanjiku ann@tmd.co.ke&#10;Peter <peter.m@x.com>&#10;Grace – grace@y.org 0722 111 222"></textarea>
+  <div class="row">
+    <div><input id="btag" placeholder="tag them (optional)"></div>
+    <div><button class="gold" id="addPeople" style="margin-top:0">Add to Contacts</button></div>
+  </div>
+  <div class="out" id="peopleMsg" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>Email a report on the highlighted rows</label>
+  <div class="row">
+    <div><input id="subj" placeholder="Weekly report"></div>
+    <div><input id="stag" placeholder="tag (blank = all)"></div>
+  </div>
+  <button id="sendBtn">Send it</button>
+  <div class="out" id="sendMsg" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>Inbox</label>
+  <div class="row">
+    <button class="ghost" id="triage">What needs me?</button>
+    <button class="ghost" id="toTab">Save to a tab</button>
+  </div>
+  <div class="out" id="inboxOut" style="display:none"></div>
+  <div class="row">
+    <div style="flex:0 0 62px"><input id="mailNo" type="number" value="1" min="1"></div>
+    <div><input id="mailHow" placeholder="apologise and promise a call"></div>
+    <div style="flex:0 0 92px"><button id="draftBtn" style="margin-top:0">Draft</button></div>
+  </div>
+  <div class="out" id="draftOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <label>Share this sheet</label>
+  <div class="row">
+    <div style="flex:2"><input id="shareEmail" placeholder="colleague@company.com"></div>
+    <div><select id="shareRole"><option value="view">Can view</option>
+      <option value="edit">Can edit</option></select></div>
+  </div>
+  <button class="ghost" id="shareBtn">Share</button>
+  <div class="out" id="shareOut" style="display:none"></div>
+
+  <div class="divider"></div>
+  <div class="row">
+    <button class="ghost small" id="openContacts">Open Contacts tab</button>
+    <button class="ghost small" id="refreshPeople">Refresh</button>
+  </div>
+  <div id="peopleList" style="margin-top:11px"></div>
+</div>
+
+<!-- ═══════════ SETUP ═══════════ -->
+<div class="page" id="p-setup">
+  <div id="wizHealth"><div class="skel"></div><div class="skel" style="width:65%"></div></div>
+
+  <div class="divider"></div>
+  <label>Paste everything you have collected</label>
+  <textarea id="bulkKeys" rows="4" placeholder="Paste all your keys here — one per line, or however they came.&#10;I work out which company each belongs to.&#10;&#10;gsk_abc…&#10;AIzaSy…&#10;sk-or-v1-…"></textarea>
+  <button class="gold" id="bulkGo">Add them all</button>
+  <div class="out" id="bulkOut" style="display:none"></div>
+  <div class="hint">Links and email addresses are ignored. Duplicates are skipped.
+  Anything rejected is listed with the reason.</div>
+
+  <div class="divider"></div>
+  <label>Where to get more — best first</label>
+  <div id="wizList"></div>
+</div>
+
+<!-- ═══════════ TELEGRAM ═══════════ -->
+<div class="page" id="p-tg">
+  <div id="tgMode" class="hint" style="margin-bottom:8px"></div>
+  <div id="tgStatus"><div class="skel"></div><div class="skel" style="width:60%"></div></div>
+
+  <div class="divider"></div>
+  <label>Step 1 · Your bot token</label>
+  <input id="tgTok2" placeholder="123456789:AAF…  from @BotFather">
+  <button class="ghost" id="tgSave2">Save token</button>
+
+  <label>Step 2 · Your web app link</label>
+  <input id="tgUrl" placeholder="https://script.google.com/macros/s/…/exec">
+  <div class="hint">Apps Script → <b>Deploy → New deployment → Web app</b> →
+  Execute as <b>Me</b>, Access <b>Anyone</b> → copy the link that ends in <b>/exec</b></div>
+
+  <label>Step 3 · Message your bot once in Telegram, then press this</label>
+  <button class="gold" id="tgFix">🛠 Fix it for me</button>
+  <div class="hint">Works through every step in order — token, chat, sending, then whichever
+  delivery method your account allows — and fixes what it can.</div>
+  <button class="ghost" id="tgConnect">🔗 Connect the webhook only</button>
+  <div class="out" id="tgOut" style="display:none"></div>
+  <button class="ghost" id="tgDiag">🩺 Why is my bot not replying?</button>
+  <button class="ghost" id="tgClearQ">🧹 Clear the backlog (stops repeat messages)</button>
+  <button class="gold" id="tgPoll">⏱ Check every minute instead (no public web app)</button>
+  <div class="hint">If your Google Workspace will not allow a deployment that
+  <b>Anyone</b> can reach — many company domains block it — use this. Replies take up to
+  a minute instead of arriving instantly, and nothing is ever made public.</div>
+  <div class="row">
+    <button class="ghost small" id="tgTest">Send me a test</button>
+    <button class="ghost small" id="tgRefresh">Refresh status</button>
+    <button class="ghost small" id="tgOff">Disconnect</button>
+  </div>
+
+  <div class="divider"></div>
+  <label>Your Telegram conversation</label>
+  <div class="chat" id="tgChat" style="padding:0;max-height:340px;overflow-y:auto"></div>
+  <div class="row" style="margin-top:9px">
+    <div style="flex:3"><input id="tgMsgBox" placeholder="Send yourself a message…"></div>
+    <div><button id="tgSendBtn" style="margin-top:0">Send</button></div>
+  </div>
+  <div class="chips" id="tgIdeas"></div>
+</div>
+
+<!-- ═══════════ KEYS ═══════════ -->
+<div class="page" id="p-keys">
+  <label>Paste a key — I work out the company</label>
+  <input id="newKey" placeholder="any key, or accountid:token for Cloudflare">
+  <div class="row">
+    <div><input id="newName" placeholder="nickname (optional)"></div>
+    <div><select id="newProv"><option value="">Auto-detect</option></select></div>
+  </div>
+  <button class="gold" id="addBtn">Add this key</button>
+  <div class="out" id="keyMsg" style="display:none"></div>
+  <div class="hint" id="whereGet"></div>
+  <div class="row">
+    <button class="ghost" id="testBtn">Test all</button>
+    <button class="ghost" id="healBtn">Repair models</button>
+  </div>
+  <div id="keyList" style="margin-top:11px"></div>
+
+  <div class="divider"></div>
+  <label>How it talks</label>
+  <div class="row">
+    <div><input id="promptName" placeholder="analyst"></div>
+    <div style="flex:2"><input id="promptFix" placeholder="it kept refusing to count"></div>
+  </div>
+  <div class="row">
+    <button class="ghost" id="promptOpen">Open Prompts tab</button>
+    <button class="ghost" id="promptFixBtn">Improve it</button>
+  </div>
+  <div class="out" id="promptOut" style="display:none"></div>
+</div>
+
+</div><!-- /left -->
+
+<div class="right">
+  <div style="padding:12px 12px 0">
+    <label style="margin-top:0">Conversation</label>
+    <div class="row">
+      <button class="ghost small" id="histRefresh">Refresh</button>
+      <button class="ghost small" id="histClear">Clear</button>
+      <button class="ghost small" id="histOpen">Open log</button>
+    </div>
+  </div>
+  <div class="chat" id="chat"></div>
+</div>
+</div><!-- /shell -->
+
+<!-- ═══════════ profile drawer ═══════════ -->
+<div class="veil" id="profVeil"></div>
+<div class="palette" id="profBox" style="display:none;top:14%">
+  <div style="padding:16px">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+      <div class="drop" id="preview" style="width:58px;height:58px;flex:0 0 58px;padding:0;
+        display:flex;align-items:center;justify-content:center;border-radius:50%;
+        background-size:cover;background-position:center">＋</div>
+      <div style="flex:1">
+        <label style="margin-top:0">Picture (optional)</label>
+        <input type="file" id="photo" accept="image/*">
+      </div>
+    </div>
+    <div class="row">
+      <div><label>Your name</label><input id="pname" maxlength="40" placeholder="Kenneth"></div>
+      <div><label>Answer style</label><select id="ptone">
+        <option value="friendly">Friendly</option><option value="brief">Very brief</option>
+        <option value="formal">Formal</option></select></div>
+    </div>
+    <div class="row">
+      <button class="gold" id="saveProf">Save</button>
+      <button class="ghost" id="dropPhoto">Remove picture</button>
+      <button class="ghost" id="closeProf">Close</button>
+    </div>
+    <div class="tiles">
+      <div class="tile"><b id="sAsks">0</b><span>questions</span></div>
+      <div class="tile"><b id="sRows">0</b><span>rows</span></div>
+      <div class="tile"><b id="sStreak">0</b><span>day streak</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ command palette ═══════════ -->
+<div class="veil" id="cmdVeil"></div>
+<div class="palette" id="cmdBox" style="display:none">
+  <input id="cmdInput" placeholder="Type what you want…  try: picture, summarise, email, brief">
+  <div class="plist" id="cmdList"></div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   state
+   ═══════════════════════════════════════════════════════════ */
+var lastAgent='', lastAnswer='', lastCode='', photoData='', picData='', voice=null;
+var autoSpeak=false, THEMES=['','dark','forest','plum','slate'], themeAt=0;
+
+/* ═══════════ toasts ═══════════ */
+function toast(text,kind){
+  var t=document.createElement('div');
+  t.className='toast'+(kind?(' '+kind):'');
+  t.textContent=text;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateY(10px)';
+    setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); },250); }, 2600);
+}
+
+/* ═══════════ tabs ═══════════ */
+var tabs=document.querySelectorAll('.tab');
+function goTab(name){
+  for(var j=0;j<tabs.length;j++) tabs[j].classList.toggle('on',tabs[j].dataset.p===name);
+  var ps=document.querySelectorAll('.page');
+  for(var k=0;k<ps.length;k++) ps[k].classList.toggle('on',ps[k].id==='p-'+name);
+  if(name==='keys') loadKeys();
+  if(name==='people') loadPeople();
+  if(name==='flow'){ loadFlows(); loadJobs(); }
+  if(name==='home'){ loadHome(); loadDash(); }
+  if(name==='setup') loadWizard();
+  if(name==='ask') loadAnTabs();
+  if(name==='tg'){ loadTgStatus(); loadTgChat(); }
+}
+for(var i=0;i<tabs.length;i++)
+  tabs[i].onclick=function(){ goTab(this.dataset.p); };
+
+/* ═══════════ theme ═══════════ */
+document.getElementById('themeBtn').onclick=function(){
+  themeAt=(themeAt+1)%THEMES.length;
+  document.body.className=document.body.className.replace(/dark|forest|plum|slate/g,'').trim();
+  if(THEMES[themeAt]) document.body.classList.add(THEMES[themeAt]);
+  if(window.innerWidth>700) document.body.classList.add('wide');
+  toast(THEMES[themeAt]?('Theme: '+THEMES[themeAt]):'Theme: light');
+};
+
+/* ═══════════ profile ═══════════ */
+function openProf(){ document.getElementById('profVeil').classList.add('on');
+  document.getElementById('profBox').style.display='block'; }
+function closeProf(){ document.getElementById('profVeil').classList.remove('on');
+  document.getElementById('profBox').style.display='none'; }
+document.getElementById('gear').onclick=openProf;
+document.getElementById('avatar').onclick=openProf;
+document.getElementById('closeProf').onclick=closeProf;
+document.getElementById('profVeil').onclick=closeProf;
+
+function paintProfile(p){
+  document.getElementById('hello').textContent=p.greeting+(p.hasName?'':' 👋');
+  document.getElementById('sub').textContent=p.hasName
+    ? (p.streak>1 ? (p.streak+' days running · '+p.asks+' questions')
+                  : (p.asks+' questions · '+p.rows+' rows'))
+    : 'Tap the circle to add your name';
+  document.getElementById('pname').value=p.name||'';
+  document.getElementById('ptone').value=p.tone||'friendly';
+  document.getElementById('sAsks').textContent=p.asks;
+  document.getElementById('sRows').textContent=p.rows;
+  document.getElementById('sStreak').textContent=p.streak;
+  var av=document.getElementById('avatar'), pv=document.getElementById('preview');
+  if(p.photo){ av.style.backgroundImage='url('+p.photo+')'; av.textContent='';
+    pv.style.backgroundImage='url('+p.photo+')'; pv.textContent=''; }
+  else { av.style.backgroundImage='';
+    av.textContent=p.name?p.name.trim().charAt(0).toUpperCase():'🙂';
+    pv.style.backgroundImage=''; pv.textContent='＋'; }
+}
+document.getElementById('photo').onchange=function(e){
+  var f=e.target.files[0]; if(!f) return;
+  shrink(f,96,0.7,function(d){ photoData=d;
+    document.getElementById('preview').style.backgroundImage='url('+d+')';
+    document.getElementById('preview').textContent=''; });
+};
+document.getElementById('saveProf').onclick=function(){
+  var b=this; b.disabled=true;
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false;
+    if(r.ok){ photoData=''; paintProfile(r.profile); closeProf(); toast('Saved','good'); }
+    else toast(r.why,'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; toast(e.message,'err'); })
+    .saveProfile(document.getElementById('pname').value, photoData,
+                 document.getElementById('ptone').value);
+};
+document.getElementById('dropPhoto').onclick=function(){ photoData='';
+  google.script.run.withSuccessHandler(function(r){ if(r.ok){ paintProfile(r.profile);
+    toast('Picture removed'); } })
+    .saveProfile('','REMOVE',document.getElementById('ptone').value); };
+
+function shrink(file,max,quality,done){
+  var rd=new FileReader();
+  rd.onload=function(ev){ var img=new Image();
+    img.onload=function(){
+      var w=img.width, h=img.height;
+      if(max===96){ var side=Math.min(w,h), cv=document.createElement('canvas');
+        cv.width=96; cv.height=96;
+        cv.getContext('2d').drawImage(img,(w-side)/2,(h-side)/2,side,side,0,0,96,96);
+        done(cv.toDataURL('image/jpeg',quality)); return; }
+      if(w>max||h>max){ var s=Math.min(max/w,max/h); w=Math.round(w*s); h=Math.round(h*s); }
+      var c2=document.createElement('canvas'); c2.width=w; c2.height=h;
+      c2.getContext('2d').drawImage(img,0,0,w,h);
+      done(c2.toDataURL('image/jpeg',quality), w, h);
+    };
+    img.src=ev.target.result; };
+  rd.readAsDataURL(file);
+}
+
+/* ═══════════ dashboard ═══════════ */
+function loadDash(){
+  google.script.run.withSuccessHandler(function(d){
+    if(!d||!d.ok) return;
+    var health={ good:['ok','All good'], thin:['rest','Add a second key'],
+                 none:['bad','No keys yet'] }[d.health]||['idle',''];
+    document.getElementById('dash').innerHTML=
+      '<div class="card"><div class="ctop">'+
+        '<span class="cname">'+esc(d.greeting)+'</span>'+
+        '<span class="chip '+health[0]+'">'+esc(health[1])+'</span></div>'+
+        '<div class="cmeta">'+esc(d.date)+' · '+esc(d.time)+'</div>'+
+      '</div>'+
+      '<div class="tiles">'+
+        tile(d.keys.ready,'keys ready')+
+        tile(d.asks,'questions')+
+        tile(d.rows,'rows done')+
+        tile(d.streak,'day streak')+
+      '</div>'+
+      (d.recent.length?('<div class="card" style="margin-top:10px">'+
+        '<div class="cmeta" style="margin:0 0 6px">RECENTLY</div>'+
+        d.recent.map(function(r){ return '<div style="font-size:12px;padding:3px 0">· '+esc(r)+'</div>'; })
+          .join('')+'</div>'):'')+
+      '<div class="card"><div class="cmeta" style="margin:0 0 6px">THIS SHEET</div>'+
+        d.tabs.slice(0,8).map(function(t){
+          return '<div style="font-size:12px;display:flex;justify-content:space-between;padding:2px 0">'+
+            '<span>'+esc(t.name)+'</span><span style="color:var(--dim)">'+t.rows+' rows</span></div>'; })
+          .join('')+'</div>';
+    setup(d);
+  }).dashboard();
+}
+function tile(n,label){ return '<div class="tile"><b>'+n+'</b><span>'+label+'</span></div>'; }
+
+function setup(d){
+  var steps=[
+    ['Add an AI key', d.keys.total>0, 'keys'],
+    ['Add a second key so it can fail over', d.keys.ready>=2, 'keys'],
+    ['Tell me your name', !!d.name, ''],
+    ['Add your contacts', false, 'people'],
+    ['Connect Telegram', d.telegram, 'keys'],
+    ['Schedule a morning brief', d.jobs>0, 'flow']
+  ];
+  document.getElementById('setupList').innerHTML=steps.map(function(s){
+    return '<div class="card" style="padding:9px 12px;cursor:'+(s[1]?'default':'pointer')+'" '+
+      (s[2]&&!s[1]?('onclick="goTab(\''+s[2]+'\')"'):'')+'>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+      '<span style="font-size:12.5px;'+(s[1]?'color:var(--dim);text-decoration:line-through':'font-weight:600')+'">'+
+      esc(s[0])+'</span><span>'+(s[1]?'✓':'→')+'</span></div></div>';
+  }).join('');
+}
+
+/* ═══════════ a guided conversation, in the drawer ═══════════ */
+var inFlow=false;
+function showFlow(r, title){
+  inFlow=!!r.inFlow;
+  var box=document.getElementById('flowBox');
+  if(!r.inFlow){
+    box.style.display='none';
+    showOut('agentOut', r.say, r.ok?'good':'warn');
+    addBubble('ai', r.say, 'guided');
+    toast(r.ok?'Done':'Stopped', r.ok?'good':'');
+    return;
+  }
+  box.style.display='block';
+  if(title) document.getElementById('flowTitle').textContent=title;
+  showOut('flowAsk', r.say, '');
+  document.getElementById('flowInput').value='';
+  document.getElementById('flowInput').focus();
+  var hints=/skip/.test(r.say) ? ['skip'] : [];
+  if(/yes or no/.test(r.say)) hints=['yes','no'];
+  document.getElementById('flowHints').innerHTML=hints.map(function(x){
+    return '<span onclick="flowQuick(\''+x+'\')">'+x+'</span>'; }).join('');
+}
+function flowQuick(v){
+  document.getElementById('flowInput').value=v;
+  document.getElementById('flowSend').click();
+}
+document.getElementById('flowSend').onclick=function(){
+  var v=document.getElementById('flowInput').value;
+  if(!v.trim()){ toast('Type your answer','err'); return; }
+  addBubble('you',v);
+  google.script.run.withSuccessHandler(function(r){ showFlow(r); })
+    .withFailureHandler(function(e){ toast(e.message,'err'); })
+    .continueFlow(v,'drawer');
+};
+document.getElementById('flowCancel').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    document.getElementById('flowBox').style.display='none';
+    inFlow=false; toast('Stopped'); }).cancelFlow('drawer');
+};
+
+/* ═══════════ answer, then check the working ═══════════ */
+document.getElementById('askCheck').onclick=function(){
+  var q=document.getElementById('q').value;
+  if(!q.trim()){ toast('Type a question first','err'); return; }
+  var b=this; b.disabled=true;
+  document.getElementById('afterAns').style.display='none';
+  document.getElementById('verifyBox').innerHTML='';
+  startTimer('ans','Answering, then checking every figure against your data…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('ans',r.text,'warn'); return; }
+    lastAnswer=r.text;
+    typeOut('ans',r.text,'good');
+    var badge='';
+    if(r.corrected){
+      badge='<span class="verify fixed">⟲ I corrected myself</span>'+
+        '<div class="firstTry"><b>First attempt:</b> '+esc(r.firstAttempt||'')+'<br>'+
+        esc(r.note||'')+'</div>';
+    } else if(r.check && r.check.clean){
+      badge='<span class="verify clean">✓ '+esc(r.check.confidence)+'</span>';
+    } else if(r.check){
+      badge='<span class="verify raw">'+esc(r.check.confidence)+'</span>';
+    }
+    document.getElementById('verifyBox').innerHTML=badge;
+    document.getElementById('afterAns').style.display='flex';
+    addBubble('you',q); addBubble('ai',r.text, r.corrected?'checked & corrected':'checked');
+    askForRating(q, r.text, 'drawer');
+    refreshProfile(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('ans','Broke: '+e.message,'err'); })
+    .askAndVerify(q,1);
+};
+
+/* ═══════════ exact analysis, no AI ═══════════ */
+function loadAnTabs(){
+  google.script.run.withSuccessHandler(function(f){
+    if(!f||!f.ok) return;
+    var opts=f.tabs.map(function(t){
+      return '<option value="'+esc(t.name)+'">'+esc(t.name)+'</option>'; }).join('');
+    document.getElementById('anTab').innerHTML=opts;
+    document.getElementById('anTabB').innerHTML=opts;
+  }).sheetFacts();
+}
+function anRun(label, fn, args, render){
+  var box=document.getElementById('anOutBox');
+  box.style.display='block';
+  startTimer('anOutBox',label);
+  var run=google.script.run
+    .withSuccessHandler(function(r){ stopTimer();
+      if(!r.ok){ showOut('anOutBox',r.why,'err'); return; }
+      showOut('anOutBox',render(r),'good');
+      addBubble('ai',render(r),'exact — no AI'); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('anOutBox',e.message,'err'); });
+  run[fn].apply(run,args);
+}
+document.getElementById('anGroups').onclick=function(){
+  anRun('Counting…','compareGroups',
+    [document.getElementById('anTab').value, document.getElementById('anCol').value, ''],
+    function(r){ return r.total+' rows across '+r.distinct+' groups\n\n'+
+      r.groups.map(function(g){ return '· '+g.name+': '+g.count+'  ('+g.share+'%)'+
+        (g.average!==undefined?('  avg '+g.average):''); }).join('\n')+
+      '\n\n'+r.notes.join('\n'); });
+};
+document.getElementById('anOut').onclick=function(){
+  anRun('Looking for the unusual…','findOutliers',
+    [document.getElementById('anTab').value, document.getElementById('anCol').value],
+    function(r){
+      var s='Column '+r.column+' — '+r.counted+' numbers\n'+
+        'Median '+r.median+', normal range '+r.normalFrom+' to '+r.normalTo+'\n';
+      if(!r.count) return s+'\nNothing unusual.';
+      if(r.high.length) s+='\nUnusually high:\n'+
+        r.high.map(function(x){ return '· row '+x.row+' — '+x.value; }).join('\n');
+      if(r.low.length) s+='\nUnusually low:\n'+
+        r.low.map(function(x){ return '· row '+x.row+' — '+x.value; }).join('\n');
+      return s; });
+};
+document.getElementById('anTrend').onclick=function(){
+  anRun('Looking across the dates…','trendOver',
+    [document.getElementById('anTab').value, document.getElementById('anCol').value, ''],
+    function(r){ return r.note+'\n\n'+
+      r.series.map(function(d){ return '· '+d.day+': '+d.count; }).join('\n'); });
+};
+document.getElementById('anCross').onclick=function(){
+  anRun('Matching them up…','crossTabs',
+    [document.getElementById('anTab').value, document.getElementById('anCol').value,
+     document.getElementById('anTabB').value, document.getElementById('anColB').value],
+    function(r){ var s=r.note+'\n';
+      if(r.missingFromB.length) s+='\nOnly in '+r.tabA+':\n'+
+        r.missingFromB.map(function(x){ return '· '+x.key+'  (row '+x.rows[0]+')'; }).join('\n');
+      if(r.missingFromA.length) s+='\n\nOnly in '+r.tabB+':\n'+
+        r.missingFromA.map(function(x){ return '· '+x.key+'  (row '+x.rows[0]+')'; }).join('\n');
+      return s; });
+};
+
+/* ═══════════ minimise & compact ═══════════ */
+function setMini(on){
+  document.body.classList.toggle('mini',!!on);
+  document.getElementById('miniBtn').textContent=on?'▣':'▁';
+  document.getElementById('miniBtn').title=on?'Bring it back (Ctrl+M)':'Minimise (Ctrl+M)';
+  if(on) toast('Minimised — tap ▣ or press Ctrl+M to bring it back');
+}
+document.getElementById('miniBtn').onclick=function(){
+  setMini(!document.body.classList.contains('mini')); };
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='m'){
+    e.preventDefault(); setMini(!document.body.classList.contains('mini')); }
+});
+function fitScreen(){
+  var w=window.innerWidth;
+  document.body.classList.toggle('wide', w>700);
+  document.body.classList.toggle('compact', w<420);
+}
+fitScreen();
+window.addEventListener('resize',fitScreen);
+
+/* ═══════════ tell them what a job will cost ═══════════ */
+function showPreview(id, kind, args, then){
+  var box=document.getElementById(id);
+  box.className='preview on';
+  box.innerHTML='<span class="spin"></span>Working out what that involves…';
+  google.script.run.withSuccessHandler(function(e){
+    if(!e){ box.className='preview'; if(then) then(true); return; }
+    box.innerHTML='<b>This will take:</b> '+esc(e.text||'a moment')+
+      (e.warnings&&e.warnings.length
+        ? ('<div class="pw">⚠ '+e.warnings.map(esc).join('<br>⚠ ')+'</div>') : '');
+    if(then) then(e.ok!==false);
+  }).estimateWork(kind,args);
+}
+
+/* ═══════════ did that help? ═══════════ */
+var LAST_ASK='', LAST_ANSWER='', LAST_WHERE='drawer';
+function askForRating(asked, answered, where){
+  LAST_ASK=asked; LAST_ANSWER=answered; LAST_WHERE=where||'drawer';
+  var r=document.getElementById('agentRate');
+  r.className='rate on';
+}
+function rateIt(good){
+  var why='';
+  if(!good){ why=prompt('What was wrong with it? (optional)')||''; }
+  google.script.run.withSuccessHandler(function(){
+    document.getElementById('agentRate').className='rate';
+    toast(good?'Thanks — noted':'Noted. I will use that to improve.', good?'good':'');
+    loadSatisfaction(); })
+    .recordFeedback(good, LAST_ASK, LAST_ANSWER, why, LAST_WHERE);
+}
+function loadSatisfaction(){
+  google.script.run.withSuccessHandler(function(s){
+    var box=document.getElementById('satBanner');
+    if(!box) return;
+    if(!s||!s.show){ box.innerHTML=''; return; }
+    box.innerHTML='<div class="card" style="border-color:var(--amber)">'+
+      '<div class="cname">🤔 Let me try harder</div>'+
+      '<div class="cmeta" style="margin-top:5px">'+esc(s.message)+'</div>'+
+      '<div class="cacts"><button class="ghost small" onclick="learnNow()">'+
+      'Rewrite my instructions</button></div></div>';
+  }).satisfactionCheck();
+}
+function learnNow(){
+  toast('Reading what went wrong…');
+  google.script.run.withSuccessHandler(function(r){
+    if(!r.ok){ toast(r.why,'err'); return; }
+    toast('Rewritten from '+r.learnedFrom+' complaints','good');
+    alert('I rewrote the "'+r.name+'" instruction:\n\n'+r.after);
+    loadSatisfaction(); }).learnFromFeedback('analyst');
+}
+
+/* ═══════════ what it understands ═══════════ */
+function loadCanDo(){
+  google.script.run.withSuccessHandler(function(groups){
+    if(!groups) return;
+    document.getElementById('canDo').innerHTML=groups.map(function(g){
+      return '<div class="cmeta" style="margin:9px 0 5px;font-weight:700;color:var(--navy2)">'+
+        esc(g.group)+'</div><div class="chips">'+
+        g.examples.map(function(e){
+          return '<span onclick="trySaying(\''+e.replace(/'/g,"\\'")+'\')">'+esc(e)+'</span>'; })
+        .join('')+'</div>';
+    }).join('');
+  }).whatCanIDo();
+}
+function trySaying(text){
+  goTab('agent');
+  document.getElementById('task').value=text;
+  document.getElementById('goBtn').click();
+}
+
+/* ═══════════ the setup wizard ═══════════ */
+function loadWizard(){
+  google.script.run.withSuccessHandler(function(w){
+    if(!w||!w.ok) return;
+    var pct=Math.min(100, Math.round((w.ready/4)*100));
+    var level = w.ready===0?'bad' : w.ready===1?'rest' : 'ok';
+    document.getElementById('wizHealth').innerHTML=
+      '<div class="card"><div class="ctop">'+
+        '<span class="cname">🔑 '+w.ready+' of '+w.total+' keys working</span>'+
+        '<span class="chip '+level+'">'+(w.ready>=2?'good':(w.ready?'thin':'none'))+'</span></div>'+
+        '<div class="meter"><i style="width:'+pct+'%"></i></div>'+
+        '<div class="cmeta">'+esc(w.advice)+'</div>'+
+        (w.have.length?('<div class="cmeta" style="margin-top:6px">Have: '+
+          w.have.map(function(h2){ return esc(h2.label); }).join(' · ')+'</div>'):'')+
+      '</div>';
+
+    document.getElementById('wizList').innerHTML=w.missing.map(function(m){
+      return '<div class="wiz'+(m.star?' star':'')+'">'+
+        '<div class="wt"><span class="wn">'+(m.star?'⭐ ':'')+esc(m.label)+'</span>'+
+        '<span class="chip idle">'+m.minutes+' min</span></div>'+
+        '<div class="wf">Free: '+esc(m.free)+'</div>'+
+        '<ol>'+m.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ol>'+
+        (m.note?('<div class="wnote">'+esc(m.note)+'</div>'):'')+
+        '<div class="cacts">'+
+          '<button class="ghost small" onclick="openSignup(\''+esc(m.url)+'\')">Open '+
+            esc(m.url.replace(/^https:\/\//,'').split('/')[0])+' ↗</button>'+
+          '<button class="ghost small" onclick="focusPaste()">I have it — paste</button>'+
+        '</div></div>';
+    }).join('');
+  }).keyWizard();
+}
+function openSignup(url){
+  window.open(url,'_blank');
+  toast('Opened in a new tab — copy the key, then come back');
+}
+function focusPaste(){
+  document.getElementById('bulkKeys').focus();
+  document.getElementById('bulkKeys').scrollIntoView({behavior:'smooth',block:'center'});
+}
+document.getElementById('bulkGo').onclick=function(){
+  var v=document.getElementById('bulkKeys').value;
+  if(!v.trim()){ toast('Paste your keys first','err'); return; }
+  var b=this; b.disabled=true;
+  startTimer('bulkOut','Working out who each key belongs to…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('bulkOut',r.why,'err'); return; }
+    var txt='Looked at '+r.scanned+' key'+(r.scanned>1?'s':'')+'.\n\n';
+    if(r.added.length) txt+='✓ Added '+r.added.length+':\n'+
+      r.added.map(function(a){ return '   '+a.company+'  ('+a.key+') using '+a.model; }).join('\n')+'\n';
+    if(r.already) txt+='\n– '+r.already+' were already there.\n';
+    if(r.failed.length) txt+='\n✗ Could not use '+r.failed.length+':\n'+
+      r.failed.map(function(f){ return '   '+f.key+' — '+f.why; }).join('\n');
+    showOut('bulkOut',txt, r.added.length?'good':'warn');
+    if(r.added.length){ document.getElementById('bulkKeys').value='';
+      toast('Added '+r.added.length+' keys','good'); }
+    loadWizard(); loadKeys(); loadDash(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('bulkOut',e.message,'err'); })
+    .bulkAddKeys(v);
+};
+
+/* ═══════════ home, kept simple ═══════════ */
+function loadHome(){
+  google.script.run.withSuccessHandler(function(p){
+    if(p) document.getElementById('homeHello').textContent=p.greeting;
+  }).getProfile();
+  google.script.run.withSuccessHandler(function(f){
+    var el=document.getElementById('homeLine');
+    if(!el) return;
+    el.textContent = (f&&f.ok)
+      ? ('I can see "'+f.name+'" — '+f.tabCount+' tabs, '+f.totalRows+' rows of data.')
+      : 'No spreadsheet connected yet.';
+  }).sheetFacts();
+}
+document.getElementById('homeAsk').onclick=function(){
+  goTab('agent'); document.getElementById('task').focus(); };
+
+var SHEET_OPEN=false;
+document.getElementById('openSheetView').onclick=function(){
+  var box=document.getElementById('sheetView');
+  if(SHEET_OPEN){ box.innerHTML=''; SHEET_OPEN=false;
+    this.textContent='📂 Show me my sheet'; return; }
+  SHEET_OPEN=true;
+  this.textContent='✕ Close';
+  box.innerHTML='<div class="skel"></div><div class="skel" style="width:60%"></div>';
+  google.script.run.withSuccessHandler(function(f){
+    if(!f||!f.ok){ box.innerHTML='<div class="empty">No spreadsheet connected.</div>'; return; }
+    GUIDE_TABS=f.tabs||[];
+    box.innerHTML='<div class="card"><div class="cmeta" style="margin-bottom:7px">'+
+      'TAP A TAB TO SEE WHAT IS IN IT</div>'+
+      (GUIDE_TABS.length
+        ? ('<div class="chips">'+GUIDE_TABS.map(function(t,i){
+            return '<span onclick="guidePick('+i+')">📄 '+esc(t.name)+' · '+t.rows+' rows</span>';
+          }).join('')+'</div>')
+        : '<div class="empty">No data tabs yet.</div>')+
+      '</div>'+
+      '<div id="guideStep2" style="display:none">'+
+        '<div class="out" id="guideDesc"></div>'+
+        '<div class="chips" id="guideActions"></div>'+
+        '<button class="ghost small" id="guideBack2" style="margin-top:9px">⬅ another tab</button>'+
+      '</div>'+
+      '<div class="out" id="guideOut" style="display:none"></div>';
+    var back=document.getElementById('guideBack2');
+    if(back) back.onclick=function(){
+      document.getElementById('guideStep2').style.display='none';
+      document.getElementById('guideOut').style.display='none'; };
+  }).sheetFacts();
+};
+
+/* ═══════════ the guided panel ═══════════ */
+var GUIDE_TABS=[], GUIDE_IDEAS=[];
+function guidePick(i){
+  var t=GUIDE_TABS[i]; if(!t) return;
+  var s2=document.getElementById('guideStep2');
+  if(s2) s2.style.display='block';
+  var d=document.getElementById('guideDesc');
+  d.style.display='block';
+  d.innerHTML='<span class="spin"></span>Looking at every column in '+esc(t.name)+'…';
+  document.getElementById('guideActions').innerHTML='';
+
+  google.script.run.withSuccessHandler(function(w){
+    if(!w||!w.ok){ d.textContent=(w&&w.why)||'I could not read that tab.'; return; }
+    GUIDE_IDEAS=w.ideas||[];
+
+    var cols=(w.profile&&w.profile.columns)||[];
+    d.className='out';
+    d.innerHTML='<b>'+esc(w.tab)+'</b> — '+w.rows+' rows, '+w.columns+' columns'+
+      '<div style="margin-top:9px">'+
+      cols.slice(0,10).map(function(c){
+        return '<div class="colcard"><span class="cn">'+esc(c.name)+'</span>'+
+          '<span class="ct">'+esc(c.type)+'</span>'+
+          '<div class="cmeta">'+c.complete+'% filled · '+c.unique+' distinct'+
+          (c.max!==undefined?(' · '+c.min+'–'+c.max):'')+'</div>'+
+          '<div class="bar"><i style="width:'+c.complete+'%"></i></div></div>'; }).join('')+
+      '</div>'+
+      (w.notes.length?('<div class="hint" style="margin-top:8px">'+
+        w.notes.map(function(n){ return '• '+esc(n); }).join('<br>')+'</div>'):'');
+
+    document.getElementById('guideActions').innerHTML=
+      '<div style="width:100%">'+GUIDE_IDEAS.map(function(idea,n){
+        return '<div class="idea" onclick="guideIdea('+n+')">'+
+          '<div class="ii">'+idea.icon+'</div>'+
+          '<div><div class="it">'+esc(idea.title)+'</div>'+
+          '<div class="iw">'+esc(idea.why)+'</div></div></div>'; }).join('')+'</div>';
+  }).whatToDoWith(t.name);
+}
+function guideIdea(n){
+  var idea=GUIDE_IDEAS[n]; if(!idea) return;
+  startTimer('guideOut',idea.title+'…');
+  google.script.run.withSuccessHandler(function(r){ stopTimer();
+    if(!r.ok){ showOut('guideOut',r.why,'err'); return; }
+    showOut('guideOut',r.answer,'good');
+    addBubble('you',idea.title); addBubble('ai',r.answer,(r.seconds||0)+'s');
+    showNext(r.answer,idea.ask);
+    toast('Done in '+(r.seconds||0)+'s','good'); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('guideOut',e.message,'err'); })
+    .runAgentTimed(idea.ask,'drawer');
+}
+function guideDo(i,action){
+  var t=GUIDE_TABS[i]; if(!t) return;
+  startTimer('guideOut','Working on '+t.name+'…');
+  google.script.run.withSuccessHandler(function(req){
+    google.script.run.withSuccessHandler(function(r){ stopTimer();
+      if(!r.ok){ showOut('guideOut',r.why,'err'); return; }
+      showOut('guideOut',r.answer,'good');
+      addBubble('you',req); addBubble('ai',r.answer,(r.seconds||0)+'s');
+      showNext(r.answer,req); toast('Done in '+(r.seconds||0)+'s','good'); })
+      .withFailureHandler(function(e){ stopTimer(); showOut('guideOut',e.message,'err'); })
+      .runAgentTimed(req,'drawer');
+  }).actionRequest(t.name,action);
+}
+
+
+/* ═══════════ starters ═══════════ */
+var TPL=[];
+function loadStarters(){
+  google.script.run.withSuccessHandler(function(list){
+    TPL=list||[];
+    document.getElementById('starters').innerHTML=TPL.map(function(t,i){
+      return '<div class="tcard" onclick="runStarter('+i+')">'+
+        '<div class="ic">'+t.icon+'</div>'+
+        '<div class="ti">'+esc(t.title)+'</div>'+
+        '<div class="wh">'+esc(t.what)+'</div></div>';
+    }).join('');
+  }).templates();
+}
+function runStarter(i){
+  var t=TPL[i]; if(!t) return;
+  if(t.id==='compare'){ goTab('world'); document.getElementById('cmpQ').focus(); return; }
+  goTab('agent');
+  document.getElementById('task').value=t.ask;
+  toast(t.icon+'  '+t.title);
+  setTimeout(function(){ document.getElementById('goBtn').click(); },220);
+}
+
+/* ═══════════ command palette ═══════════ */
+var CMDS=[
+  ['◈','Home','the dashboard',function(){goTab('home');}],
+  ['✦','Assistant','ask for anything',function(){goTab('agent');}],
+  ['▤','Data','questions about your cells',function(){goTab('ask');}],
+  ['✧','Make','pictures, docs, slides, code',function(){goTab('make');}],
+  ['◍','World','news, research, weather',function(){goTab('world');}],
+  ['⚡','Flows','saved workflows and jobs',function(){goTab('flow');}],
+  ['◉','People','contacts and email',function(){goTab('people');}],
+  ['⚿','Keys','your AI companies',function(){goTab('keys');}],
+  ['◎','Setup','get more free keys, step by step',function(){goTab('setup');}],
+  ['▁','Minimise','tuck it out of the way',function(){setMini(true);}],
+  ['✓','Answer & check','answer, then verify every figure',function(){goTab('ask');
+    document.getElementById('q').focus();}],
+  ['📍','Find outliers','exact maths, no AI',function(){goTab('ask');
+    setTimeout(function(){document.getElementById('anCol').focus();},250);}],
+  ['📋','Paste many keys','add a whole pile at once',function(){goTab('setup');
+    setTimeout(focusPaste,250);}],
+  ['✈','Telegram','connect your bot and see the chat',function(){goTab('tg');}],
+  ['🔗','Connect Telegram','one button, in the right order',function(){goTab('tg');
+    document.getElementById('tgUrl').focus();}],
+  ['☀️','Brief me','calendar, inbox, news',function(){goTab('world');
+    document.getElementById('briefBtn').click();}],
+  ['🎨','Make a picture','free, no key needed',function(){goTab('make');
+    document.getElementById('imgP').focus();}],
+  ['📄','Write a document','a real Google Doc',function(){goTab('make');
+    document.getElementById('docT').focus();}],
+  ['📊','Build slides','a real Slides deck',function(){goTab('make');
+    document.getElementById('slT').focus();}],
+  ['💻','Write code','15 languages',function(){goTab('make');
+    document.getElementById('cdR').focus();}],
+  ['🎬','Plan a video','script and storyboard',function(){goTab('make');
+    document.getElementById('vdT').focus();}],
+  ['🐝','Research swarm','many agents, one brief',function(){goTab('world');
+    document.getElementById('swarmTopic').focus();}],
+  ['⚖️','Compare AIs','same question, several models',function(){goTab('world');
+    document.getElementById('cmpQ').focus();}],
+  ['🎧','Hands-free','talk to it',function(){goTab('agent');
+    document.getElementById('handsBtn').click();}],
+  ['↩','Undo the last change','restore the sheet',function(){goTab('ask');
+    document.getElementById('undoBtn').click();}],
+  ['🔑','Test all keys','which are alive',function(){goTab('keys');
+    setTimeout(function(){document.getElementById('testBtn').click();},250);}],
+  ['🔧','Repair models','fix a failing key',function(){goTab('keys');
+    setTimeout(function(){document.getElementById('healBtn').click();},250);}],
+  ['📥','Triage my inbox','what needs me',function(){goTab('people');
+    setTimeout(function(){document.getElementById('triage').click();},250);}],
+  ['🎨','Change theme','five looks',function(){document.getElementById('themeBtn').click();}]
+];
+var cmdSel=0;
+function openCmd(){
+  document.getElementById('cmdVeil').classList.add('on');
+  document.getElementById('cmdBox').style.display='block';
+  var inp=document.getElementById('cmdInput');
+  inp.value=''; inp.focus(); drawCmd('');
+}
+function closeCmd(){
+  document.getElementById('cmdVeil').classList.remove('on');
+  document.getElementById('cmdBox').style.display='none';
+}
+function matches(q){
+  if(!q) return CMDS.slice(0,10);
+  var t=q.toLowerCase(), out=[];
+  for(var i=0;i<CMDS.length;i++){
+    var hay=(CMDS[i][1]+' '+CMDS[i][2]).toLowerCase();
+    var pos=0, ok=true;
+    for(var c=0;c<t.length;c++){
+      if(t[c]===' ') continue;
+      pos=hay.indexOf(t[c],pos);
+      if(pos===-1){ ok=false; break; }
+      pos++;
+    }
+    if(ok) out.push(CMDS[i]);
+  }
+  return out.slice(0,10);
+}
+function drawCmd(q){
+  var list=matches(q); cmdSel=0;
+  document.getElementById('cmdList').innerHTML= list.length
+    ? list.map(function(c,i){
+        return '<div class="pitem'+(i===0?' sel':'')+'" data-i="'+CMDS.indexOf(c)+'">'+
+          '<div class="pi">'+c[0]+'</div><div><div class="pt">'+esc(c[1])+'</div>'+
+          '<div class="pd">'+esc(c[2])+'</div></div></div>'; }).join('')
+    : ('<div class="pitem"><div class="pi">↵</div><div><div class="pt">Ask the assistant</div>'+
+       '<div class="pd">"'+esc(q)+'"</div></div></div>');
+  var items=document.querySelectorAll('.pitem');
+  for(var i=0;i<items.length;i++) items[i].onclick=function(){ pickCmd(this,q); };
+}
+function pickCmd(el,q){
+  var idx=el.getAttribute('data-i');
+  closeCmd();
+  if(idx===null||idx===undefined){
+    goTab('agent'); document.getElementById('task').value=q;
+    document.getElementById('goBtn').click(); return;
+  }
+  CMDS[Number(idx)][3]();
+}
+document.getElementById('cmdBtn').onclick=openCmd;
+document.getElementById('cmdVeil').onclick=closeCmd;
+document.getElementById('cmdInput').oninput=function(){ drawCmd(this.value); };
+document.getElementById('cmdInput').onkeydown=function(e){
+  var items=document.querySelectorAll('.pitem');
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();
+    items[cmdSel].classList.remove('sel');
+    cmdSel=(cmdSel+(e.key==='ArrowDown'?1:items.length-1))%items.length;
+    items[cmdSel].classList.add('sel');
+  } else if(e.key==='Enter'){ e.preventDefault();
+    if(items[cmdSel]) pickCmd(items[cmdSel], this.value);
+  } else if(e.key==='Escape'){ closeCmd(); }
+};
+
+/* ═══════════ keyboard ═══════════ */
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); openCmd(); }
+  if(e.key==='Escape'){ closeCmd(); closeProf(); }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    var on=document.querySelector('.page.on');
+    if(on&&on.id==='p-agent'){ e.preventDefault(); document.getElementById('goBtn').click(); }
+    if(on&&on.id==='p-ask'){ e.preventDefault(); document.getElementById('askBtn').click(); }
+  }
+});
+
+/* ═══════════ chat transcript ═══════════ */
+function addBubble(who,text,meta){
+  var box=document.getElementById('chat'); if(!box) return;
+  var b=document.createElement('div');
+  b.className='bubble '+(who==='you'?'you':'ai');
+  b.textContent=text;
+  box.appendChild(b);
+  if(meta){ var m=document.createElement('div'); m.className='meta'; m.innerHTML=meta;
+            box.appendChild(m); }
+  box.scrollTop=box.scrollHeight;
+  var r=document.querySelector('.right'); if(r) r.scrollTop=r.scrollHeight;
+}
+function loadHistory(){
+  google.script.run.withSuccessHandler(function(h){
+    var box=document.getElementById('chat'); if(!box) return;
+    box.innerHTML='';
+    if(!h||!h.turns||!h.turns.length){
+      box.innerHTML='<div class="empty">Nothing yet.<br>Ask something and it appears here.</div>';
+      return; }
+    h.turns.forEach(function(t){
+      addBubble(t.who==='you'?'you':'ai', t.text,
+        t.who==='you' ? clockOf(t.when)
+          : (clockOf(t.when)+(t.seconds?(' <b>'+t.seconds+'s</b>'):'')+
+             (t.tools?(' · '+esc(t.tools)):'')));
+    });
+  }).chatHistory(24);
+}
+document.getElementById('histRefresh').onclick=loadHistory;
+document.getElementById('histClear').onclick=function(){
+  if(!confirm('Clear the whole conversation log?')) return;
+  google.script.run.withSuccessHandler(function(){ loadHistory(); toast('Cleared'); }).clearHistory(); };
+document.getElementById('histOpen').onclick=function(){
+  google.script.run.ensureChatSheet(); toast('Chat log tab ready'); };
+
+/* ═══════════ live timer ═══════════ */
+var tick=null;
+function startTimer(id,label){
+  var t0=Date.now(), el=document.getElementById(id);
+  el.style.display='block';
+  stopTimer();
+  tick=setInterval(function(){
+    el.className='out';
+    el.innerHTML='<span class="spin"></span>'+label+
+      '<span class="timer">'+((Date.now()-t0)/1000).toFixed(1)+'s</span>';
+  },100);
+  return t0;
+}
+function stopTimer(){ if(tick){ clearInterval(tick); tick=null; } }
+
+/* ═══════════ hands-free ═══════════ */
+var V={ wake:'jarvis', needWake:true, autoSpeak:true, rate:1.02, lang:'en-KE' };
+var rec=null, handsFree=false, busy=false, speaking=false, restartTimer=null;
+var SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+function orb(state,label){
+  var o=document.getElementById('orb');
+  o.className='orb '+(state||'off');
+  o.textContent= state==='listening'?'🎧':state==='heard'?'👂':
+                 state==='thinking'?'⚙️':state==='speaking'?'🔊':'🎧';
+  document.getElementById('vstate').textContent=label||'';
+}
+function loadVoice(){
+  google.script.run.withSuccessHandler(function(s){
+    if(!s) return; V=s;
+    document.getElementById('wakeWord').value=s.wake;
+    document.getElementById('vlang').value=s.lang;
+    document.getElementById('vrate').value=String(s.rate);
+    document.getElementById('needWake').value=s.needWake?'yes':'no';
+    document.getElementById('vhint').innerHTML= s.needWake
+      ? ('Say <b>"'+esc(s.wake)+', what is urgent today?"</b>')
+      : 'Open mic. Say <b>stop listening</b> to end.';
+  }).getVoiceSettings();
+}
+document.getElementById('voiceCfg').onclick=function(){
+  var b=document.getElementById('voiceBox');
+  b.style.display=(b.style.display==='none')?'block':'none';
+};
+document.getElementById('vsave').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    V=r.settings; loadVoice(); toast('Voice settings saved','good');
+    if(handsFree){ stopHands(); setTimeout(startHands,300); } })
+    .saveVoiceSettings({ wake:document.getElementById('wakeWord').value,
+      lang:document.getElementById('vlang').value,
+      rate:document.getElementById('vrate').value,
+      needWake:document.getElementById('needWake').value==='yes', autoSpeak:true });
+};
+
+var chosenVoice=null;
+function pickVoice(){
+  if(!window.speechSynthesis) return null;
+  var all=speechSynthesis.getVoices()||[];
+  if(!all.length) return null;
+  var want=(V.lang||'en-KE').slice(0,2);
+  var order=['Google UK English Female','Google US English','Microsoft Aria',
+             'Microsoft Libby','Samantha','Google UK English Male'];
+  for(var i=0;i<order.length;i++)
+    for(var j=0;j<all.length;j++)
+      if(all[j].name.indexOf(order[i])!==-1) return all[j];
+  for(var k=0;k<all.length;k++)
+    if(String(all[k].lang||'').slice(0,2)===want) return all[k];
+  return all[0];
+}
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged=function(){ chosenVoice=pickVoice(); };
+  setTimeout(function(){ chosenVoice=pickVoice(); },400);
+}
+var lastSpoken='', lastSpokenAt=0, greeted=false;
+function sayThen(text, after){
+  if(!window.speechSynthesis){ if(after) after(); return; }
+  var t=String(text||'').trim();
+  if(!t){ if(after) after(); return; }
+  /* Do not say the same thing twice within half a minute — that was the
+     "it keeps repeating itself" problem. */
+  if(t===lastSpoken && (Date.now()-lastSpokenAt)<30000){
+    orb('listening','Listening');
+    if(after) after();
+    return;
+  }
+  lastSpoken=t; lastSpokenAt=Date.now();
+  speaking=true; pauseListening(); speechSynthesis.cancel();
+  var clean=String(text).slice(0,900)
+    .replace(/https?:\/\/\S+/g,'a link, which is on screen')
+    .replace(/[*_#`>|]/g,' ').replace(/\s*\n\s*/g,'. ')
+    .replace(/\.{2,}/g,'.').replace(/\s{2,}/g,' ');
+  var u=new SpeechSynthesisUtterance(clean);
+  if(!chosenVoice) chosenVoice=pickVoice();
+  if(chosenVoice) u.voice=chosenVoice;
+  u.rate=V.rate||1.02; u.lang=V.lang||'en-KE';
+  u.onend=function(){ speaking=false; if(after) after(); };
+  u.onerror=function(){ speaking=false; if(after) after(); };
+  orb('speaking','Speaking…');
+  speechSynthesis.speak(u);
+}
+function say(text){ sayThen(text,function(){ resumeListening(); }); }
+function pauseListening(){ if(rec){ try{ rec.abort(); }catch(e){} } }
+function resumeListening(){ if(!handsFree) return;
+  clearTimeout(restartTimer);
+  restartTimer=setTimeout(function(){ startRec(); },350); }
+
+function startRec(){
+  if(!handsFree||busy||speaking) return;
+  if(!SRC){ orb('off','Voice needs Chrome'); return; }
+  try{
+    rec=new SRC();
+    rec.lang=V.lang||'en-KE'; rec.continuous=true; rec.interimResults=true;
+    rec.onstart=function(){ orb('listening', V.needWake
+      ? ('Listening for "'+V.wake+'"'):'Listening'); };
+    rec.onresult=function(ev){
+      var interim='', finalText='';
+      for(var i=ev.resultIndex;i<ev.results.length;i++){
+        var chunk=ev.results[i][0].transcript;
+        if(ev.results[i].isFinal) finalText+=chunk; else interim+=chunk; }
+      var showing=(finalText||interim).trim();
+      if(showing) document.getElementById('heard').textContent='“'+showing+'”';
+      if(finalText.trim()) handleHeard(finalText.trim());
+    };
+    rec.onerror=function(e){
+      if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+        handsFree=false; orb('off','Microphone blocked');
+        document.getElementById('handsBtn').textContent='Start hands-free';
+        toast('Chrome blocked the mic — use the web app tab','err');
+        return; }
+      if(e.error==='no-speech'||e.error==='aborted') return;
+      orb('listening','Listening');
+    };
+    rec.onend=function(){ if(handsFree&&!busy&&!speaking) resumeListening(); };
+    rec.start();
+  }catch(err){ orb('off','Could not start the mic'); handsFree=false; }
+}
+var lastAsked='', lastAskedAt=0;
+function handleHeard(said){
+  var lower=said.toLowerCase();
+
+  /* If the microphone caught our own voice, ignore it. */
+  if(lastSpoken && lower.length>8 &&
+     lastSpoken.toLowerCase().indexOf(lower.slice(0,Math.min(24,lower.length)))!==-1){
+    return;
+  }
+  if(/\b(stop listening|that is all|thats all|go to sleep)\b/.test(lower)){
+    sayThen('Going quiet.', stopHands); return; }
+  var request=said;
+  if(V.needWake){
+    var w=String(V.wake||'jarvis').toLowerCase(), at=lower.indexOf(w);
+    if(at===-1) return;
+    request=said.slice(at+w.length).replace(/^[\s,.:;!?-]+/,'').trim();
+    if(!request){ sayThen('Yes?',function(){ orb('heard','Go ahead'); resumeListening(); }); return; }
+  }
+  if(request.length<2) return;
+  /* The same request twice in five seconds is a stutter, not a second question. */
+  if(request===lastAsked && (Date.now()-lastAskedAt)<5000) return;
+  lastAsked=request; lastAskedAt=Date.now();
+  voiceAsk(request);
+}
+function voiceAsk(request){
+  busy=true; pauseListening(); orb('thinking','Working on it…');
+  document.getElementById('heard').textContent='“'+request+'”';
+  addBubble('you',request);
+  var t0=Date.now();
+  google.script.run
+    .withSuccessHandler(function(r){ busy=false;
+      var secs=((Date.now()-t0)/1000).toFixed(1);
+      var text=(r&&r.ok)?r.answer:((r&&r.why)||'I could not do that.');
+      lastAgent=text;
+      showOut('agentOut',text,(r&&r.ok)?'good':'err');
+      addBubble('ai',text, secs+'s · '+esc((r&&r.tools&&r.tools.length)?r.tools.join(' → '):'voice'));
+      paintTrail(r);
+      sayThen((r&&r.say)?r.say:text, function(){ orb('listening','Listening'); resumeListening(); });
+    })
+    .withFailureHandler(function(e){ busy=false;
+      showOut('agentOut','Broke: '+e.message,'err');
+      sayThen('Something went wrong.', function(){ resumeListening(); }); })
+    .talkTo(request,'voice');
+}
+function startHands(){
+  if(!SRC){ toast('Hands-free needs Chrome','err'); return; }
+  handsFree=true;
+  var b=document.getElementById('handsBtn');
+  b.textContent='Stop hands-free'; b.classList.remove('gold');
+  if(greeted){
+    /* Already said hello once. Just start listening. */
+    orb('listening', V.needWake?('Listening for "'+V.wake+'"'):'Listening');
+    startRec();
+    return;
+  }
+  greeted=true;
+  google.script.run.withSuccessHandler(function(g){
+    sayThen(((g&&g.ok)?g.text:'Ready.')+' '+
+      (V.needWake?('Say '+V.wake+' when you need me.'):'I am listening.'),
+      function(){ orb('listening',V.needWake?('Listening for "'+V.wake+'"'):'Listening');
+                  startRec(); });
+  }).spokenGreeting();
+}
+function stopHands(){
+  handsFree=false; busy=false; greeted=false; lastSpoken=''; clearTimeout(restartTimer);
+  if(rec){ try{ rec.stop(); }catch(e){} try{ rec.abort(); }catch(e){} rec=null; }
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  orb('off','Hands-free is off');
+  document.getElementById('heard').textContent='';
+  var b=document.getElementById('handsBtn');
+  b.textContent='Start hands-free'; b.classList.add('gold');
+}
+document.getElementById('handsBtn').onclick=function(){ handsFree?stopHands():startHands(); };
+document.getElementById('voiceTog').onclick=function(){
+  autoSpeak=!autoSpeak; this.textContent=autoSpeak?'🔊':'🔈';
+  this.classList.toggle('on',autoSpeak);
+  toast(autoSpeak?'Answers will be read aloud':'Voice off');
+  if(autoSpeak) say('Voice on.');
+};
+document.getElementById('hello').onclick=function(){
+  google.script.run.withSuccessHandler(function(g){ if(g&&g.ok) say(g.text); }).spokenGreeting(); };
+document.getElementById('mic').onclick=function(){
+  if(!SRC){ toast('Voice needs Chrome','err'); return; }
+  var btn=this;
+  if(voice){ try{ voice.stop(); }catch(e){} voice=null; btn.classList.remove('on'); return; }
+  voice=new SRC(); voice.lang=V.lang||'en-KE'; voice.interimResults=false;
+  voice.onresult=function(ev){ document.getElementById('task').value=ev.results[0][0].transcript; };
+  voice.onend=function(){ voice=null; btn.classList.remove('on'); };
+  voice.onerror=function(){ voice=null; btn.classList.remove('on'); };
+  btn.classList.add('on'); voice.start();
+};
+
+/* ═══════════ the assistant ═══════════ */
+function paintTrail(r){
+  var h='';
+  ((r&&r.trail)||[]).forEach(function(s){
+    h+='<div class="step"><b>Step '+s.step+'</b> · '+esc(s.tool||'thinking')+
+       '<br>'+esc(s.result||'')+'</div>'; });
+  document.getElementById('trail').innerHTML=h;
+  document.getElementById('afterAgent').style.display=h?'flex':'none';
+}
+function showNext(answer,ask){
+  google.script.run.withSuccessHandler(function(list){
+    var box=document.getElementById('nextChips');
+    box.innerHTML=(list||[]).map(function(s){
+      return '<span onclick="askNext(this)">'+esc(s)+'</span>'; }).join('');
+  }).suggestNext(answer,ask);
+}
+function askNext(el){
+  goTab('agent');
+  document.getElementById('task').value=el.textContent;
+  document.getElementById('goBtn').click();
+}
+document.getElementById('goBtn').onclick=function(){
+  var task=document.getElementById('task').value;
+  if(!task.trim()){ toast('Tell me what you need first','err'); return; }
+  var b=this; b.disabled=true;
+  document.getElementById('trail').innerHTML='';
+  document.getElementById('nextChips').innerHTML='';
+  document.getElementById('afterAgent').style.display='none';
+  addBubble('you',task);
+  var askedText=task;
+  document.getElementById('task').value='';
+  document.getElementById('agentRate').className='rate';
+
+  /* Something that needs a few details? Have a conversation instead. */
+  google.script.run.withSuccessHandler(function(straight){
+    if(straight){
+      b.disabled=false;
+      showOut('agentOut', straight.ok?straight.answer:straight.why, straight.ok?'good':'err');
+      addBubble('ai', straight.ok?straight.answer:straight.why,
+        (straight.seconds||0)+'s · '+esc(straight.tool)+' · no guessing');
+      askForRating(askedText, straight.answer||'', 'drawer');
+      toast('Done in '+(straight.seconds||0)+'s', straight.ok?'good':'err');
+      return;
+    }
+    google.script.run.withSuccessHandler(function(intent){
+    if(intent){
+      b.disabled=false;
+      google.script.run.withSuccessHandler(function(r){
+        showFlow(r, r.title||'Let us do this properly');
+      }).startFlow(intent,'drawer');
+      return;
+    }
+    runTheAgent(b, askedText);
+    }).detectIntent(askedText);
+  }).runDirect(task);
+};
+
+function runTheAgent(b, askedText){
+  startTimer('agentOut','Working on it…');
+  google.script.run
+    .withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+      if(!r.ok){ showOut('agentOut',r.why,'err'); addBubble('ai',r.why); return; }
+      lastAgent=r.answer;
+      typeOut('agentOut',r.answer,r.ranOut?'warn':'good');
+      var used=(r.tools&&r.tools.length)?r.tools.join(' → '):'no tools';
+      addBubble('ai',r.answer,(r.seconds||0)+'s · '+esc(used)+' · '+((r.trail||[]).length||0)+' step(s)');
+      paintTrail(r);
+      showNext(r.answer,askedText);
+      askForRating(askedText, r.answer, 'drawer');
+      if(autoSpeak) say(r.answer);
+      refreshProfile();
+      toast('Done in '+(r.seconds||0)+'s','good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('agentOut','Broke: '+e.message,'err'); })
+    .runAgentTimed(askedText,'drawer');
+}
+document.getElementById('speak').onclick=function(){ say(lastAgent||'Nothing to read.'); };
+document.getElementById('toSheet').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    toast(r.ok?('Written at '+r.where):r.why, r.ok?'good':'err'); })
+    .writeBelowSelection(lastAgent); };
+document.getElementById('saveFlow').onclick=function(){
+  var n=prompt('Name this workflow:','my_routine');
+  if(!n) return;
+  google.script.run.withSuccessHandler(function(r){
+    toast(r.ok?('Saved "'+r.name+'" with '+r.steps+' steps'):r.why, r.ok?'good':'err');
+    loadFlows(); }).workflowFromHistory(n,8); };
+
+/* ═══════════ pictures in ═══════════ */
+var drop=document.getElementById('drop'), picInput=document.getElementById('pic');
+drop.onclick=function(){ picInput.click(); };
+drop.ondragover=function(e){ e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave=function(){ drop.classList.remove('over'); };
+drop.ondrop=function(e){ e.preventDefault(); drop.classList.remove('over');
+  if(e.dataTransfer.files&&e.dataTransfer.files[0]) loadPic(e.dataTransfer.files[0]); };
+picInput.onchange=function(e){ if(e.target.files[0]) loadPic(e.target.files[0]); };
+function loadPic(file){
+  shrink(file,1100,0.85,function(d,w,h){
+    picData=d;
+    var th=document.getElementById('thumb');
+    th.src=d; th.style.display='block';
+    drop.textContent='Picture ready — '+w+'×'+h;
+  });
+}
+function picRun(which){
+  if(!picData){ toast('Choose a picture first','err'); return; }
+  var t0=startTimer('picOut', which==='table'?'Reading the table…':'Looking at it…');
+  var q=document.getElementById('picQ').value;
+  var handler=function(r){ stopTimer();
+    var s=((Date.now()-t0)/1000).toFixed(1);
+    if(!r.ok){ showOut('picOut',r.why,'err'); return; }
+    var out= which==='table'
+      ? ('✓ '+r.rows+' rows × '+r.columns+' columns written to "'+r.sheet+'"') : r.text;
+    showOut('picOut',out+'\n\n('+s+'s)','good');
+    addBubble('you',q||'(a picture)'); addBubble('ai',out,s+'s · picture');
+    toast('Read in '+s+'s','good'); };
+  var fail=function(e){ stopTimer(); showOut('picOut',e.message,'err'); };
+  if(which==='table')
+    google.script.run.withSuccessHandler(handler).withFailureHandler(fail)
+      .imageToTable(picData,'image/jpeg','From picture');
+  else
+    google.script.run.withSuccessHandler(handler).withFailureHandler(fail)
+      .askImage(picData,'image/jpeg',q);
+}
+document.getElementById('picAsk').onclick=function(){ picRun('ask'); };
+document.getElementById('picTable').onclick=function(){ picRun('table'); };
+
+/* ═══════════ data tab ═══════════ */
+document.getElementById('askBtn').onclick=function(){
+  var q=document.getElementById('q').value;
+  if(!q.trim()){ toast('Type a question first','err'); return; }
+  var b=this; b.disabled=true;
+  document.getElementById('afterAns').style.display='none';
+  startTimer('ans','Reading your cells…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('ans',r.text,'warn'); return; }
+    lastAnswer=r.text;
+    var bad=/^(NO KEY|ALL KEYS|BUG)/.test(r.text);
+    typeOut('ans',r.text,bad?'err':(r.refused?'warn':'good'));
+    document.getElementById('sel').textContent='Read '+r.rows+' rows from '+r.label+
+      (r.refused?' — try including the header row':'');
+    if(!bad){ document.getElementById('afterAns').style.display='flex';
+      addBubble('you',q); addBubble('ai',r.text,r.rows+' rows');
+      refreshProfile(); } })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('ans','Broke: '+e.message,'err'); })
+    .askSelection(q);
+};
+document.getElementById('putBelow').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    toast(r.ok?('Written at '+r.where):r.why, r.ok?'good':'err'); })
+    .writeBelowSelection(lastAnswer); };
+document.getElementById('copy').onclick=function(){ grab(lastAnswer,this,'Copy'); };
+
+function fillArgs(){ return [document.getElementById('job').value,
+  document.getElementById('src').value.toUpperCase(),
+  document.getElementById('tgt').value.toUpperCase(),
+  document.getElementById('r1').value, document.getElementById('r2').value]; }
+document.getElementById('runBtn').onclick=function(){
+  var b=this; b.disabled=true; startTimer('runOut','Filling, one row at a time…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('runOut',r.why,'err'); return; }
+    showOut('runOut','✓ Filled '+r.done+' rows, skipped '+r.skipped+'.'+
+      (r.stopped?('\n\nStopped early:\n'+r.stopped):''), r.stopped?'warn':'good');
+    refreshProfile(); toast('Filled '+r.done+' rows','good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('runOut',e.message,'err'); })
+    .fillColumn.apply(null,[]); };
+document.getElementById('runBtn').onclick=function(){
+  var b=this, a=fillArgs();
+  showPreview('fillPreview','fill_column',{first:a[3],last:a[4]});
+  b.disabled=true; startTimer('runOut','Filling, one row at a time…');
+  var run=google.script.run
+    .withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+      if(!r.ok){ showOut('runOut',r.why,'err'); return; }
+      showOut('runOut','✓ Filled '+r.done+' rows, skipped '+r.skipped+'.'+
+        (r.stopped?('\n\nStopped early:\n'+r.stopped):''), r.stopped?'warn':'good');
+      refreshProfile(); toast('Filled '+r.done+' rows','good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('runOut',e.message,'err'); });
+  run.fillColumn(a[0],a[1],a[2],a[3],a[4]);
+};
+document.getElementById('fastBtn').onclick=function(){
+  var b=this, a=fillArgs();
+  showPreview('fillPreview','enrich_batch',{first:a[3],last:a[4]});
+  b.disabled=true; startTimer('runOut','Batching — this is the quick one…');
+  var run=google.script.run
+    .withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+      if(!r.ok){ showOut('runOut',r.why,'err'); return; }
+      showOut('runOut','✓ Filled '+r.done+' of '+r.asked+' rows in just '+r.calls+
+        ' request'+(r.calls>1?'s':'')+'. '+(r.stopped||r.note||''), r.stopped?'warn':'good');
+      refreshProfile(); toast(r.done+' rows in '+r.calls+' requests','good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('runOut',e.message,'err'); });
+  run.enrichBatch(a[0],a[1],a[2],a[3],a[4],12);
+};
+
+var POWER='', POWERS=[
+  ['Make me data','Generate data: 20 Kenyan customers with town and spend'],
+  ['Clean a column','Clean column D'],
+  ['Find duplicates','Find duplicates in column B'],
+  ['Split a column','Split column E into Name, Town, Phone starting at G'],
+  ['Draw a chart','Make a pie chart from A1:B10 called Complaints by branch'],
+  ['Write a formula','Write a formula in H1 that counts delivery complaints'],
+  ['Sort a range','Sort A2:F61 by column 6']
+];
+(function(){ var w=document.getElementById('powers');
+  POWERS.forEach(function(p){ var s=document.createElement('span'); s.textContent=p[0];
+    s.onclick=function(){ POWER=p[1]; document.getElementById('powerArg').value=p[1];
+      document.getElementById('powerArg').focus(); };
+    w.appendChild(s); }); })();
+document.getElementById('powerGo').onclick=function(){
+  var arg=document.getElementById('powerArg').value.trim();
+  if(!arg){ toast('Pick a superpower and edit the detail','err'); return; }
+  var b=this; b.disabled=true; startTimer('powerOut','Working…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    showOut('powerOut', r.ok?r.answer:(r.why||'That did not work.'), r.ok?'good':'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('powerOut',e.message,'err'); })
+    .runAgent(arg,'drawer'); };
+document.getElementById('undoBtn').onclick=function(){
+  if(!confirm('Undo the last change to your sheet?')) return;
+  google.script.run.withSuccessHandler(function(r){
+    toast(r.ok?('Undone — '+r.restored):r.why, r.ok?'good':'err'); }).undoLast(); };
+
+/* ═══════════ make ═══════════ */
+function makeRun(id,label,fn,args,done){
+  var t0=startTimer(id,label);
+  var run=google.script.run
+    .withSuccessHandler(function(r){ stopTimer();
+      var s=((Date.now()-t0)/1000).toFixed(1);
+      if(!r.ok){ showOut(id,r.why,'err'); toast('Did not work','err'); return; }
+      var msg=done(r);
+      showOut(id,msg+'\n\n('+s+'s)','good');
+      addBubble('ai',msg,s+'s · '+fn);
+      toast('Done in '+s+'s','good'); })
+    .withFailureHandler(function(e){ stopTimer(); showOut(id,e.message,'err'); });
+  run[fn].apply(run,args);
+}
+document.getElementById('imgGo').onclick=function(){
+  var p=document.getElementById('imgP').value;
+  if(!p.trim()){ toast('Describe the picture first','err'); return; }
+  var toDrive=document.getElementById('imgW').value==='drive';
+  makeRun('imgOut','Drawing it…', toDrive?'imageToDrive':'imageIntoSheet',
+    [p,1024,1024,document.getElementById('imgS').value],
+    function(r){ return r.link?('✓ Saved to Drive:\n'+r.link):('✓ Placed at '+r.where); });
+};
+document.getElementById('docGo').onclick=function(){
+  var t=document.getElementById('docT').value;
+  if(!t.trim()){ toast('Give it a title','err'); return; }
+  makeRun('docOut','Writing it…','makeDoc',
+    [t,document.getElementById('docB').value,document.getElementById('docS').value],
+    function(r){ return '✓ "'+r.title+'" — '+r.words+' words\n'+r.link; });
+};
+document.getElementById('pdfGo').onclick=function(){
+  makeRun('docOut','Exporting…','sheetToPdf',[],function(r){ return '✓ PDF saved:\n'+r.link; }); };
+document.getElementById('slGo').onclick=function(){
+  var t=document.getElementById('slT').value;
+  if(!t.trim()){ toast('Give the deck a title','err'); return; }
+  makeRun('slOut','Planning the slides…','makeSlides',
+    [t,document.getElementById('slB').value,document.getElementById('slN').value],
+    function(r){ return '✓ '+r.slides+' slides built\n'+r.link; });
+};
+document.getElementById('cdGo').onclick=function(){
+  var q=document.getElementById('cdR').value;
+  if(!q.trim()){ toast('Describe what the code should do','err'); return; }
+  makeRun('cdOut','Writing the code…','writeCodeFile',
+    [q,document.getElementById('cdL').value,''],
+    function(r){ lastCode=r.code;
+      return '✓ '+r.language+', '+r.lines+' lines'+(r.link?('\n'+r.link):'')+'\n\n'+r.code; });
+};
+function videoRun(frames){
+  var t=document.getElementById('vdT').value;
+  if(!t.trim()){ toast('What is the video about?','err'); return; }
+  makeRun('vdOut', frames?'Writing it and drawing the frames…':'Writing the script…',
+    'makeVideoPlan',[t,document.getElementById('vdS').value,frames],
+    function(r){ return '✓ '+r.shots+' shots in "'+r.sheet+'"'+
+      (r.frames?(' with '+r.frames+' frames'):'')+'\n\n'+r.note; });
+}
+document.getElementById('vdGo').onclick=function(){ videoRun(false); };
+document.getElementById('vdF').onclick=function(){ videoRun(true); };
+
+/* ═══════════ world ═══════════ */
+document.getElementById('briefBtn').onclick=function(){
+  var b=this; b.disabled=true;
+  startTimer('briefOut','Reading your calendar, inbox and the news…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('briefOut',r.why,'err'); return; }
+    lastAgent=r.text; typeOut('briefOut',r.text,'good');
+    addBubble('ai',r.text,'brief'); if(autoSpeak) say(r.text); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('briefOut',e.message,'err'); })
+    .personalBrief({});
+};
+document.getElementById('speakBrief').onclick=function(){ say(lastAgent||'Nothing to read yet.'); };
+function fetchWorld(save){
+  var topic=document.getElementById('topic').value||'artificial intelligence';
+  var s=document.getElementById('src2').value;
+  var phrase= s==='tech' ? ('Search Hacker News for '+topic)
+            : s==='wiki' ? ('Look up '+topic+' on Wikipedia')
+            : ('Search the news for '+topic+(save?' and save it to a tab called Feed':''));
+  startTimer('worldOut','Fetching…');
+  google.script.run.withSuccessHandler(function(r){ stopTimer();
+    showOut('worldOut', r.ok?r.answer:(r.why||'Nothing came back.'), r.ok?'good':'err'); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('worldOut',e.message,'err'); })
+    .runAgent(phrase,'drawer');
+}
+document.getElementById('fetchBtn').onclick=function(){ fetchWorld(false); };
+document.getElementById('saveFeed').onclick=function(){ fetchWorld(true); };
+document.getElementById('cmpGo').onclick=function(){
+  var q=document.getElementById('cmpQ').value;
+  if(!q.trim()){ toast('What should I ask them?','err'); return; }
+  var b=this; b.disabled=true;
+  startTimer('cmpOut','Asking each of them…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('cmpOut',r.why,'err'); return; }
+    var txt=r.results.map(function(x){
+      return (x.failed?'✗ ':'✓ ')+x.company+'  ('+x.seconds+'s, '+x.words+' words)\n'+
+        x.answer.slice(0,420); }).join('\n\n');
+    showOut('cmpOut', txt+(r.verdict?('\n\n⚖️ '+r.verdict):''),'good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('cmpOut',e.message,'err'); })
+    .compareModels(q,3);
+};
+document.getElementById('swarmBtn').onclick=function(){
+  var topic=document.getElementById('swarmTopic').value;
+  if(!topic.trim()){ toast('Give them something to research','err'); return; }
+  var b=this; b.disabled=true;
+  startTimer('swarmOut','Planning the angles, then sending the team out…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('swarmOut',r.why,'err'); return; }
+    showOut('swarmOut', r.report+'\n\n['+r.worked+' of '+r.agents+' agents · '+
+      r.sources.join(', ')+(r.sheet?(' · saved to "'+r.sheet+'"'):'')+']',
+      r.degraded?'warn':'good');
+    lastAgent=r.report; toast(r.worked+' agents reported back','good'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('swarmOut',e.message,'err'); })
+    .swarm(topic, document.getElementById('swarmN').value,
+           document.getElementById('swarmUrls').value, true);
+};
+function quick(phrase){
+  startTimer('quickOut','…');
+  google.script.run.withSuccessHandler(function(r){ stopTimer();
+    showOut('quickOut', r.ok?r.answer:(r.why||'Nothing came back.'), r.ok?'good':'err'); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('quickOut',e.message,'err'); })
+    .runAgent(phrase,'drawer');
+}
+document.getElementById('wxBtn').onclick=function(){
+  quick('What is the weather at latitude -1.03 longitude 37.07 in Thika?'); };
+document.getElementById('fxBtn').onclick=function(){ quick('What is the USD to KES exchange rate?'); };
+document.getElementById('yBtn').onclick=function(){ quick('What was I doing yesterday?'); };
+
+/* ═══════════ flows ═══════════ */
+function loadFlows(){
+  google.script.run.withSuccessHandler(function(list){
+    var box=document.getElementById('flowList');
+    if(!list||!list.length){ box.innerHTML='<div class="empty">No workflows yet.<br>Build one below.</div>'; return; }
+    box.innerHTML=list.map(function(f){
+      return '<div class="card"><div class="ctop"><span class="cname">⚡ '+esc(f.name)+'</span>'+
+        '<span class="chip idle">'+f.steps.length+' steps</span></div>'+
+        '<div class="cmeta">'+esc(f.what||'')+'</div>'+
+        '<div class="cmeta">run '+f.runs+' times'+(f.last?(' · last '+esc(f.last)):'')+'</div>'+
+        '<div class="cacts">'+
+        '<button class="ghost small" onclick="runFlow(\''+f.name+'\')">Run it</button>'+
+        '<button class="ghost small" onclick="dropFlow(\''+f.name+'\')">Delete</button>'+
+        '</div></div>'; }).join('');
+  }).listWorkflows();
+}
+function runFlow(name){
+  startTimer('flowOut','Running "'+name+'"…');
+  document.getElementById('flowOut').style.display='block';
+  google.script.run.withSuccessHandler(function(r){ stopTimer();
+    if(!r.ok){ showOut('flowOut',r.why,'err'); return; }
+    var txt=r.steps.map(function(s){
+      return (s.ok?'✓ ':'✗ ')+'Step '+s.step+': '+s.ask+'\n   '+s.result; }).join('\n\n');
+    showOut('flowOut','Ran "'+r.name+'" in '+r.seconds+'s\n\n'+txt, r.failed?'warn':'good');
+    toast('Workflow finished','good'); loadFlows(); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('flowOut',e.message,'err'); })
+    .runWorkflow(name);
+}
+function dropFlow(name){
+  if(!confirm('Delete the workflow "'+name+'"?')) return;
+  google.script.run.withSuccessHandler(function(){ loadFlows(); toast('Deleted'); })
+    .deleteWorkflow(name);
+}
+document.getElementById('flowRefresh').onclick=loadFlows;
+document.getElementById('flowSave').onclick=function(){
+  var n=document.getElementById('flowName').value;
+  if(!n.trim()){ toast('Give it a name','err'); return; }
+  google.script.run.withSuccessHandler(function(r){
+    if(!r.ok){ showOut('flowOut',r.why,'err'); return; }
+    showOut('flowOut','✓ Saved "'+r.name+'" with '+r.steps+' steps.','good');
+    toast('Workflow saved','good'); loadFlows(); })
+    .saveWorkflow(n, document.getElementById('flowWhat').value,
+                  document.getElementById('flowSteps').value);
+};
+document.getElementById('flowFromChat').onclick=function(){
+  var n=prompt('Name this workflow:','my_routine'); if(!n) return;
+  google.script.run.withSuccessHandler(function(r){
+    showOut('flowOut', r.ok?('✓ Saved "'+r.name+'" from your last '+r.steps+' questions.'):r.why,
+      r.ok?'good':'err'); loadFlows(); }).workflowFromHistory(n,8);
+};
+document.getElementById('jobAdd').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('jobOut', r.ok?('✓ '+r.job+' scheduled for '+r.hour+':00 daily.'):r.why,
+      r.ok?'good':'err'); toast('Scheduled','good'); loadJobs(); })
+    .addJob(document.getElementById('jobName').value,
+            document.getElementById('jobHour').value,1); };
+document.getElementById('jobClear').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('jobOut','Cleared '+r.removed+' scheduled job(s).','warn'); }).removeAllJobs(); };
+function loadJobs(){
+  google.script.run.withSuccessHandler(function(list){
+    if(!list||!list.length) return;
+    showOut('jobOut', list.map(function(j){ return '· '+j.job+' — '+j.what; }).join('\n'),'');
+  }).listJobs();
+}
+
+/* ═══════════ people ═══════════ */
+function loadPeople(){ google.script.run.withSuccessHandler(drawPeople).readContacts(); }
+function drawPeople(list){
+  var box=document.getElementById('peopleList');
+  if(!list.length){ box.innerHTML='<div class="empty">No contacts yet.<br>Paste some above.</div>'; return; }
+  box.innerHTML='<div class="hint" style="margin-bottom:8px"><b>'+list.length+' contacts</b></div>'+
+    list.map(function(c){
+      return '<div class="card"><div class="ctop"><span class="cname">'+esc(c.name)+'</span>'+
+        (c.tags?('<span class="chip rest">'+esc(c.tags)+'</span>'):'')+'</div>'+
+        '<div class="cmeta">'+esc(c.email||'no email')+'</div>'+
+        (c.phone?('<div class="cmeta">'+esc(c.phone)+'</div>'):'')+
+        (c.last?('<div class="cmeta">last contacted '+esc(c.last)+'</div>'):'')+
+        '<div class="cacts"><button class="ghost small" onclick="dropPerson('+c.row+')">Remove</button></div>'+
+        '</div>'; }).join('');
+}
+function dropPerson(row){
+  if(!confirm('Remove this contact?')) return;
+  google.script.run.withSuccessHandler(function(){ loadPeople(); toast('Removed'); })
+    .deleteContactRow(row);
+}
+document.getElementById('addPeople').onclick=function(){
+  var txt=document.getElementById('blob').value;
+  if(!txt.trim()){ toast('Paste something first','err'); return; }
+  var b=this; b.disabled=true;
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false;
+    if(!r.ok){ showOut('peopleMsg',r.why,'err'); return; }
+    document.getElementById('blob').value='';
+    showOut('peopleMsg','✓ Added '+r.added.length+
+      (r.added.length?(': '+r.added.join(', ')):'')+
+      (r.skipped.length?('\nSkipped '+r.skipped.length+' already there.'):''),'good');
+    toast('Added '+r.added.length+' contacts','good'); loadPeople(); })
+    .withFailureHandler(function(e){ b.disabled=false; showOut('peopleMsg',e.message,'err'); })
+    .addContactsFromText(txt, document.getElementById('btag').value);
+};
+document.getElementById('refreshPeople').onclick=loadPeople;
+document.getElementById('openContacts').onclick=function(){
+  google.script.run.withSuccessHandler(function(){ loadPeople(); toast('Contacts tab ready'); })
+    .ensureContactsSheet(); };
+document.getElementById('sendBtn').onclick=function(){
+  var b=this; b.disabled=true; startTimer('sendMsg','Writing and sending…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('sendMsg',r.why,'err'); return; }
+    showOut('sendMsg','✓ Sent to '+r.sent.length+': '+r.sent.join(', ')+
+      (r.failed.length?('\nCould not reach: '+r.failed.join(', ')):'')+'\n\n'+r.preview,'good');
+    toast('Emailed '+r.sent.length+' people','good'); loadPeople(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('sendMsg',e.message,'err'); })
+    .sendReport(document.getElementById('subj').value,'',
+                document.getElementById('stag').value,false);
+};
+document.getElementById('triage').onclick=function(){
+  var b=this; b.disabled=true; startTimer('inboxOut','Reading your inbox…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    r.ok?typeOut('inboxOut',r.text,'good'):showOut('inboxOut',r.why,'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('inboxOut',e.message,'err'); })
+    .triageInbox(10);
+};
+document.getElementById('toTab').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('inboxOut', r.ok?('✓ Saved '+r.added+' emails to "'+r.sheet+'"'):r.why,
+      r.ok?'good':'err'); }).inboxToSheet(10); };
+document.getElementById('draftBtn').onclick=function(){
+  var b=this; b.disabled=true; startTimer('draftOut','Writing…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    r.ok ? showOut('draftOut','✓ Draft saved in Gmail for "'+r.subject+'"\n\n'+r.text,'good')
+         : showOut('draftOut',r.why,'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('draftOut',e.message,'err'); })
+    .draftReply(document.getElementById('mailNo').value,
+                document.getElementById('mailHow').value);
+};
+document.getElementById('shareBtn').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('shareOut', r.ok?('✓ Shared with '+r.email+' ('+r.role+')'):r.why, r.ok?'good':'err');
+    if(r.ok) toast('Shared','good'); })
+    .shareWith(document.getElementById('shareEmail').value,
+               document.getElementById('shareRole').value==='edit'); };
+
+/* ═══════════ keys ═══════════ */
+function loadKeys(){ google.script.run.withSuccessHandler(drawKeys).listKeysForUI(); }
+function drawKeys(list){
+  var box=document.getElementById('keyList');
+  if(!list.length){ box.innerHTML='<div class="empty">No keys yet.<br>Paste one above to switch it on.</div>'; return; }
+  box.innerHTML=list.map(function(k){
+    var chip=k.enabled?(k.resting?'<span class="chip rest">resting</span>'
+                                 :'<span class="chip ok">ready</span>')
+                      :'<span class="chip idle">off</span>';
+    return '<div class="card'+(k.enabled?'':' off')+'"><div class="ctop">'+
+      '<span class="cname">'+esc(k.nickname)+'</span>'+chip+'</div>'+
+      '<div class="cmeta">'+esc(k.company)+' · '+esc(k.masked)+'</div>'+
+      '<div class="cmeta">'+esc(k.model)+' ('+k.choices+' available)</div>'+
+      '<div class="cmeta">✓ '+k.wins+' · ✗ '+k.fails+'</div>'+
+      '<div class="cacts">'+
+        '<button class="ghost small" onclick="flip(\''+k.id+'\')">'+(k.enabled?'Off':'On')+'</button>'+
+        '<button class="ghost small" onclick="refile(\''+k.id+'\')">Wrong company?</button>'+
+        '<button class="ghost small" onclick="drop2(\''+k.id+'\')">Remove</button>'+
+      '</div></div>'; }).join('');
+}
+function flip(id){ google.script.run.withSuccessHandler(loadKeys).toggleKey(id); }
+function drop2(id){ if(!confirm('Remove this key?')) return;
+  google.script.run.withSuccessHandler(function(){ loadKeys(); toast('Removed'); }).removeKey(id); }
+function refile(id){
+  startTimer('keyMsg','Asking each company whose key this is…');
+  google.script.run.withSuccessHandler(function(r){ stopTimer();
+    if(!r.ok){ showOut('keyMsg',r.why,'err'); return; }
+    showOut('keyMsg', r.changed?('✓ Moved from '+r.from+' to '+r.company):('✓ '+r.why),'good');
+    loadKeys(); })
+    .withFailureHandler(function(e){ stopTimer(); showOut('keyMsg',e.message,'err'); })
+    .reidentifyKey(id);
+}
+document.getElementById('addBtn').onclick=function(){
+  var k=document.getElementById('newKey').value;
+  if(!k.trim()){ toast('Paste a key first','err'); return; }
+  var b=this; b.disabled=true;
+  startTimer('keyMsg','Checking the key and finding a model…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){ showOut('keyMsg',r.why,'err'); toast('Not accepted','err'); return; }
+    document.getElementById('newKey').value='';
+    document.getElementById('newName').value='';
+    showOut('keyMsg','✓ '+r.company+' added'+(r.identified?(' — worked out '+r.identified):'')+
+      ',\nusing '+r.model+' ('+r.available+' models available).','good');
+    toast(r.company+' added','good'); loadKeys(); loadDash(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('keyMsg',e.message,'err'); })
+    .addKey(document.getElementById('newName').value,k,document.getElementById('newProv').value);
+};
+document.getElementById('testBtn').onclick=function(){
+  var b=this; b.disabled=true; startTimer('keyMsg','Testing every key…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.rows.length){ showOut('keyMsg','No keys yet.','warn'); return; }
+    var mark={ working:'✓', nocredit:'💳', off:'–' };
+    showOut('keyMsg', r.verdict+'\n\n'+
+      r.rows.map(function(x){ return (mark[x.status]||'✗')+' '+x.nickname+' — '+x.note; }).join('\n')+
+      (r.notes.length?('\n\n'+r.notes.join('\n')):''),
+      r.working>0?(r.broken?'warn':'good'):'err');
+    toast(r.working+' keys working', r.working?'good':'err');
+    loadKeys(); loadDash(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('keyMsg',e.message,'err'); })
+    .keyReport(); };
+document.getElementById('healBtn').onclick=function(){
+  var b=this; b.disabled=true;
+  startTimer('keyMsg','Asking each company what it offers today…');
+  google.script.run.withSuccessHandler(function(rows){ b.disabled=false; stopTimer();
+    showOut('keyMsg', rows.length?rows.map(function(r){
+      return (r.ok?'✓ ':'✗ ')+r.nickname+' — '+r.note; }).join('\n'):'No keys yet.','good');
+    toast('Models repaired','good'); loadKeys(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('keyMsg',e.message,'err'); })
+    .healAllKeys(); };
+
+function loadTg(){ google.script.run.withSuccessHandler(function(c){
+  if(c.hasToken) showOut('tgMsg', c.hasChat?('✓ Connected to chat '+c.chat)
+    :'Token saved. Message your bot, then press Find my chat.', c.hasChat?'good':'warn');
+}).telegramConfig(); }
+document.getElementById('promptOpen').onclick=function(){
+  google.script.run.withSuccessHandler(function(){
+    showOut('promptOut','The Prompts tab is ready. Edit any row and it takes effect immediately.','good');
+  }).ensurePromptSheet(); };
+document.getElementById('promptFixBtn').onclick=function(){
+  var n=document.getElementById('promptName').value.trim();
+  if(!n){ toast('Which prompt? Try analyst or classifier','err'); return; }
+  var b=this; b.disabled=true; startTimer('promptOut','Rewriting it…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    showOut('promptOut', r.ok?('✓ Improved "'+r.name+'":\n\n'+r.after):r.why, r.ok?'good':'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('promptOut',e.message,'err'); })
+    .improvePrompt(n, document.getElementById('promptFix').value); };
+
+/* ═══════════ what am I working on? ═══════════ */
+function loadWorkset(){
+  google.script.run.withSuccessHandler(function(w){
+    var bar=document.getElementById('wsBar');
+    if(!w||!w.ok){
+      bar.style.display='block';
+      document.getElementById('wsNote').innerHTML=
+        '<b style="color:var(--red)">'+esc((w&&w.why)||'I cannot see the spreadsheet.')+'</b>';
+      document.getElementById('wsTab').innerHTML='';
+      return;
+    }
+    /* Inside the sheet you just highlight cells, so the bar stays out of the way. */
+    if(w.live){ bar.style.display='none'; return; }
+
+    bar.style.display='block';
+    var sel=document.getElementById('wsTab');
+    sel.innerHTML=w.tabs.map(function(t){
+      return '<option value="'+esc(t.name)+'"'+(t.name===w.tab?' selected':'')+'>'+
+        esc(t.name)+' ('+t.rows+')</option>'; }).join('');
+    if(!w.tab && w.tabs.length) sel.value=w.tabs[0].name;
+    document.getElementById('wsRange').value=w.range||'';
+    document.getElementById('wsNote').innerHTML=
+      'No live selection here, so I read <b>'+esc(w.using||'the first tab')+'</b>. '+
+      'Pick a tab and range to be precise.';
+  }).worksetInfo();
+}
+document.getElementById('wsSave').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    if(!r.ok){ toast(r.why,'err'); return; }
+    toast('Working on '+r.tab+(r.range?(' · '+r.range):''),'good');
+    loadWorkset(); loadDash(); })
+    .setWorkset(document.getElementById('wsTab').value,
+                document.getElementById('wsRange').value);
+};
+
+/* ═══════════ telegram ═══════════ */
+function loadTgStatus(){
+  google.script.run.withSuccessHandler(function(s){
+    var box=document.getElementById('tgStatus');
+    if(!s.hasToken){
+      box.innerHTML='<div class="card"><div class="ctop">'+
+        '<span class="cname">✈ Not set up yet</span>'+
+        '<span class="chip idle">step 1</span></div>'+
+        '<div class="cmeta">Open Telegram, message <b>@BotFather</b>, send <b>/newbot</b>, '+
+        'and paste the token below.</div></div>';
+      return; }
+
+    var chip = s.hooked ? '<span class="chip ok">live</span>'
+             : s.hasChat ? '<span class="chip rest">not connected</span>'
+             : '<span class="chip rest">needs your chat</span>';
+    var lines=[];
+    lines.push('Bot: '+esc(s.botName||'unknown'));
+    lines.push('Chat: '+(s.hasChat?esc(s.chat):'not found yet'));
+    lines.push('Webhook: '+(s.hooked?'connected':'not connected'));
+    if(s.webApp) lines.push('URL: '+esc(s.webApp.slice(0,58))+'…');
+    google.script.run.withSuccessHandler(function(m){
+      if(!m) return;
+      var el=document.getElementById('tgMode');
+      if(!el) return;
+      el.innerHTML='<b>Delivery:</b> '+esc(m.mode)+' — '+esc(m.why);
+      if(m.mode==='polling'){
+        google.script.run.withSuccessHandler(function(h2){
+          if(!h2) return;
+          el.innerHTML+='<br>'+(h2.running
+            ? ('<span style="color:var(--green)">✓ '+esc(h2.say)+'</span>')
+            : ('<b style="color:var(--red)">⚠ '+esc(h2.why)+'</b>'));
+        }).pollHealth();
+      }
+    }).deliveryMode();
+    if(s.pending) lines.push('<b style="color:var(--red)">⚠ '+s.pending+
+      ' messages are queued — these WILL replay as duplicates. '+
+      'Press "Clear the backlog" below.</b>');
+    if(s.lastError) lines.push('⚠ Telegram said: '+esc(s.lastError));
+
+    box.innerHTML='<div class="card"><div class="ctop">'+
+      '<span class="cname">✈ '+esc(s.botName||'Your bot')+'</span>'+chip+'</div>'+
+      lines.map(function(l){ return '<div class="cmeta">'+l+'</div>'; }).join('')+
+      (s.hooked?('<div class="cmeta" style="color:var(--green);margin-top:6px">'+
+        '✓ Message your bot and it will answer.</div>'):'')+'</div>';
+
+    if(s.webApp && !document.getElementById('tgUrl').value)
+      document.getElementById('tgUrl').value=s.webApp;
+  }).telegramStatus();
+}
+document.getElementById('tgSave2').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('tgOut', r.ok?'✓ Token saved. Now message your bot in Telegram, then press Connect.':r.why,
+      r.ok?'good':'err');
+    if(r.ok) toast('Token saved','good');
+    loadTgStatus(); }).saveTelegram(document.getElementById('tgTok2').value,'');
+};
+document.getElementById('tgFix').onclick=function(){
+  var b=this; b.disabled=true;
+  startTimer('tgOut','Working through it…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    var lines=(r.steps||[]).map(function(s){ return '✓ '+s; }).join('\n');
+    if(!r.ok){
+      showOut('tgOut',(lines?lines+'\n\n':'')+'✗ '+r.why,'warn');
+      toast('Not finished — read the note','err'); return; }
+    showOut('tgOut',lines+'\n\n'+r.say,'good');
+    toast(r.mode==='webhook'?'Connected — replies are instant'
+                            :'Connected — replies within a minute','good');
+    loadTgStatus(); loadTgChat(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('tgOut',e.message,'err'); })
+    .fixTelegram(document.getElementById('tgUrl').value);
+};
+
+document.getElementById('tgConnect').onclick=function(){
+  var u=document.getElementById('tgUrl').value;
+  if(!u.trim()){ toast('Paste your web app link first','err'); return; }
+  var b=this; b.disabled=true;
+  startTimer('tgOut','Finding your chat, then connecting…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    if(!r.ok){
+      showOut('tgOut',(r.steps&&r.steps.length?('✓ '+r.steps.join('\n✓ ')+'\n\n'):'')+r.why,'warn');
+      toast('Not finished yet','err'); return; }
+    showOut('tgOut','✓ '+r.steps.join('\n✓ ')+'\n\n'+r.say,'good');
+    toast('Telegram is live','good');
+    loadTgStatus(); loadTgChat(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('tgOut',e.message,'err'); })
+    .connectTelegram(u);
+};
+document.getElementById('tgTest').onclick=function(){
+  google.script.run.withSuccessHandler(function(r){
+    showOut('tgOut', r.ok?'✓ Sent. Check your phone.':r.why, r.ok?'good':'err');
+    if(r.ok) toast('Sent to your phone','good'); loadTgChat(); })
+    .telegramSay('🔔 Test from your sheet — everything is working.'); };
+document.getElementById('tgDiag').onclick=function(){
+  var b=this; b.disabled=true;
+  startTimer('tgOut','Checking every step…');
+  google.script.run.withSuccessHandler(function(d){ b.disabled=false; stopTimer();
+    var txt=d.lines.join('\n');
+    if(d.fix.length) txt+='\n\n── WHAT TO DO ──\n• '+d.fix.join('\n• ');
+    else txt+='\n\n✅ Everything checks out. If it still will not reply, '+
+      'send /status to your bot from the phone.';
+    showOut('tgOut',txt, d.ok?'good':'warn');
+    toast(d.ok?'All clear':'Found '+d.fix.length+' thing(s) to fix', d.ok?'good':'err'); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('tgOut',e.message,'err'); })
+    .telegramDiagnose();
+};
+document.getElementById('tgClearQ').onclick=function(){
+  if(!confirm('Throw away any messages Telegram is still holding?\n\n'+
+    'This is the cure for repeated messages.')) return;
+  var b=this; b.disabled=true;
+  startTimer('tgOut','Clearing the queue…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    showOut('tgOut', r.ok?('✓ '+r.say):r.why, r.ok?'good':'err');
+    if(r.ok) toast('Backlog cleared','good');
+    loadTgStatus(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('tgOut',e.message,'err'); })
+    .clearBacklog();
+};
+document.getElementById('tgPoll').onclick=function(){
+  if(!confirm('Switch to checking every minute?\n\n'+
+    'The webhook is removed. Replies will take up to a minute, but no public '+
+    'deployment is needed.')) return;
+  var b=this; b.disabled=true;
+  startTimer('tgOut','Switching over…');
+  google.script.run.withSuccessHandler(function(r){ b.disabled=false; stopTimer();
+    showOut('tgOut', r.ok?('✓ '+r.say):r.why, r.ok?'good':'err');
+    if(r.ok) toast('Now checking every minute','good');
+    loadTgStatus(); })
+    .withFailureHandler(function(e){ b.disabled=false; stopTimer();
+      showOut('tgOut',e.message,'err'); })
+    .enablePolling();
+};
+document.getElementById('tgRefresh').onclick=function(){ loadTgStatus(); loadTgChat(); };
+document.getElementById('tgOff').onclick=function(){
+  if(!confirm('Disconnect the webhook? Your bot will stop replying.')) return;
+  google.script.run.withSuccessHandler(function(r){
+    showOut('tgOut', r.ok?('✓ '+r.say):r.why, r.ok?'warn':'err');
+    loadTgStatus(); }).disconnectTelegram(); };
+
+function loadTgChat(){
+  google.script.run.withSuccessHandler(function(c){
+    var box=document.getElementById('tgChat');
+    if(!c||!c.turns||!c.turns.length){
+      box.innerHTML='<div class="empty">Nothing yet.<br>'+
+        'Message your bot on your phone and it appears here.</div>';
+      return; }
+    box.innerHTML='';
+    c.turns.forEach(function(t){
+      var b=document.createElement('div');
+      b.className='bubble '+(t.who==='you'?'you':'ai');
+      b.textContent=t.text;
+      box.appendChild(b);
+      var m=document.createElement('div');
+      m.className='meta';
+      m.innerHTML=(t.who==='you'?'📱 ':'✈ ')+clockOf(t.when)+
+        (t.seconds?(' <b>'+t.seconds+'s</b>'):'')+(t.tools?(' · '+esc(t.tools)):'');
+      box.appendChild(m);
+    });
+    box.scrollTop=box.scrollHeight;
+  }).telegramConversation(24);
+}
+document.getElementById('tgSendBtn').onclick=function(){
+  var m=document.getElementById('tgMsgBox').value;
+  if(!m.trim()){ toast('Type something first','err'); return; }
+  google.script.run.withSuccessHandler(function(r){
+    if(!r.ok){ toast(r.why,'err'); return; }
+    document.getElementById('tgMsgBox').value='';
+    toast('Sent to your phone','good'); loadTgChat(); }).telegramSay(m);
+};
+chips('tgIdeas',['/status','/where','/help','Good morning!','Reminder: send the report',
+  '🔔 Check the sheet','Test message'],'tgMsgBox');
+
+/* ═══════════ one click, one action ═══════════ */
+(function guardEveryButton(){
+  var all=document.querySelectorAll('button');
+  for(var i=0;i<all.length;i++){
+    (function(b){
+      var wrapped=b.onclick;
+      if(!wrapped) return;
+      var busyUntil=0;
+      b.onclick=function(ev){
+        var now=Date.now();
+        if(now<busyUntil) return;          /* an impatient second click */
+        busyUntil=now+700;
+        return wrapped.call(this,ev);
+      };
+    })(all[i]);
+  }
+})();
+
+/* ═══════════ helpers ═══════════ */
+function showOut(id,text,cls){
+  var el=document.getElementById(id);
+  el.style.display='block';
+  el.className='out'+(cls?' '+cls:'');
+  el.textContent=text;
+}
+function typeOut(id,text,cls){
+  var el=document.getElementById(id);
+  el.style.display='block';
+  el.className='out'+(cls?' '+cls:'');
+  el.textContent='';
+  var words=String(text).split(' '), i=0;
+  (function step(){
+    if(i>=words.length) return;
+    el.textContent+=(i?' ':'')+words[i++];
+    setTimeout(step,14);
+  })();
+}
+/* Timestamps arrive in whatever shape Sheets felt like. Find the clock. */
+function clockOf(when){
+  var m=/(\d{1,2}:\d{2})/.exec(String(when||''));
+  return m?m[1]:'';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function grab(text,btn,label){
+  var t=document.createElement('textarea');
+  t.value=text; document.body.appendChild(t); t.select();
+  document.execCommand('copy'); document.body.removeChild(t);
+  btn.textContent='Copied ✓'; toast('Copied');
+  setTimeout(function(){ btn.textContent=label; },1200);
+}
+function refreshProfile(){ google.script.run.withSuccessHandler(paintProfile).getProfile(); }
+function chips(box,list,target){
+  var w=document.getElementById(box);
+  list.forEach(function(t){ var s=document.createElement('span'); s.textContent=t;
+    s.onclick=function(){ document.getElementById(target).value=t; }; w.appendChild(s); });
+}
+chips('quickTask',['Hello','What can you see in my sheet?','How many rows do I have?','Brief me','What was I doing yesterday?','What is new in AI?',
+  'Make me 20 rows of test data','Draw me a logo'],'task');
+chips('quickAsk',['Top 3 problems?','Which branch is worst?','What should I fix first?',
+  'Anything dangerous here?'],'q');
+
+/* ═══════════ start ═══════════ */
+if(window.innerWidth>700) document.body.classList.add('wide');
+window.addEventListener('resize',function(){
+  document.body.classList.toggle('wide', window.innerWidth>700); });
+
+refreshProfile();
+loadWorkset();
+loadHome();
+loadHome();
+loadDash();
+loadSatisfaction();
+loadAnTabs();
+loadCanDo();
+loadStarters();
+loadHistory();
+loadVoice();
+</script>
+</body>
+</html>
